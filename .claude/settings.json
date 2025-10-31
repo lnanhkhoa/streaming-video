@@ -1,0 +1,27 @@
+{
+  "includeCoAuthoredBy": false,
+  "statusLine": {
+    "type": "command",
+    "command": ".claude/statusline.sh",
+    "padding": 0
+  },
+  "disabledMcpjsonServers": ["filesystem"],
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(node:*)",
+      "Bash(curl:*)",
+      "Bash(bun:*)",
+      "Bash(bun run:*)",
+      "Bash(bun add:*)",
+      "Bash(bun dev)",
+      "Bash(bunx tsc:*)",
+      "WebSearch",
+      "WebFetch(domain:*)"
+    ],
+    "deny": ["Read(**/node_modules/**)", "Read(**/.next/**)", "Read(**/build/**)", "Read(**/.git/**)"],
+    "ask": [],
+    "defaultMode": "acceptEdits"
+  },
+  "outputStyle": "default"
+}
