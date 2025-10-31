@@ -16,6 +16,7 @@ Create production-ready Docker containers and deployment configuration for all s
 #### 1.1 API Dockerfile
 
 **`apps/api/Dockerfile`**:
+
 ```dockerfile
 FROM oven/bun:1-alpine AS base
 
@@ -51,6 +52,7 @@ CMD ["bun", "run", "dist/index.js"]
 #### 1.2 Worker Dockerfile
 
 **`apps/worker/Dockerfile`**:
+
 ```dockerfile
 FROM oven/bun:1-alpine AS base
 
@@ -90,6 +92,7 @@ CMD ["bun", "run", "dist/index.js"]
 #### 1.3 Web Dockerfile
 
 **`apps/web/Dockerfile`**:
+
 ```dockerfile
 FROM oven/bun:1-alpine AS base
 
@@ -143,6 +146,7 @@ CMD ["node", "server.js"]
 ```
 
 **Update `apps/web/next.config.js`**:
+
 ```javascript
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -158,6 +162,7 @@ module.exports = nextConfig
 ### 2. Docker Compose Production
 
 **`docker-compose.yml`**:
+
 ```yaml
 version: '3.9'
 
@@ -173,7 +178,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-admin}"]
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER:-admin}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -186,7 +191,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -201,7 +206,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
       interval: 30s
       timeout: 10s
       retries: 5
@@ -217,7 +222,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
       interval: 30s
       timeout: 20s
       retries: 3
@@ -240,7 +245,7 @@ services:
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-password}
       PORT: 3001
     ports:
-      - "3001:3001"
+      - '3001:3001'
     depends_on:
       postgres:
         condition: service_healthy
@@ -292,7 +297,7 @@ services:
       NODE_ENV: production
       NEXT_PUBLIC_API_URL: http://api:3001
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - api
     networks:
@@ -314,6 +319,7 @@ volumes:
 ### 3. Environment Variables for Production
 
 **`.env.production.example`**:
+
 ```env
 # Database
 DB_USER=admin
@@ -345,6 +351,7 @@ FFMPEG_CRF=23
 ### 4. Build Scripts
 
 **Update root `package.json`**:
+
 ```json
 {
   "scripts": {
@@ -364,6 +371,7 @@ FFMPEG_CRF=23
 ### 5. Database Migration Setup
 
 **Create migration script** `scripts/migrate.sh`:
+
 ```bash
 #!/bin/bash
 set -e
@@ -375,17 +383,20 @@ echo "Migrations completed successfully"
 ```
 
 Make executable:
+
 ```bash
 chmod +x scripts/migrate.sh
 ```
 
 **Add to API Dockerfile** (before CMD):
+
 ```dockerfile
 COPY scripts/migrate.sh ./scripts/
 RUN chmod +x ./scripts/migrate.sh
 ```
 
 **Update `packages/@repo/database/package.json`**:
+
 ```json
 {
   "scripts": {
@@ -397,6 +408,7 @@ RUN chmod +x ./scripts/migrate.sh
 ### 6. Health Checks
 
 **Add to `apps/api/src/app.ts`**:
+
 ```typescript
 app.get('/health', async (c) => {
   // Check database
@@ -426,45 +438,53 @@ app.get('/health', async (c) => {
 **First time deployment**:
 
 1. Clone repository:
+
 ```bash
 git clone <repo-url>
 cd streaming-video
 ```
 
 2. Copy environment file:
+
 ```bash
 cp .env.production.example .env
 ```
 
 3. Edit `.env` with production values:
+
 ```bash
 nano .env
 ```
 
 4. Build and start services:
+
 ```bash
 docker-compose build
 docker-compose up -d
 ```
 
 5. Run migrations:
+
 ```bash
 docker-compose exec api ./scripts/migrate.sh
 ```
 
 6. Verify services:
+
 ```bash
 docker-compose ps
 docker-compose logs -f
 ```
 
 7. Check health:
+
 ```bash
 curl http://localhost:3001/health
 curl http://localhost:3000
 ```
 
 **Subsequent deployments**:
+
 ```bash
 git pull
 docker-compose build
@@ -475,6 +495,7 @@ docker-compose exec api ./scripts/migrate.sh
 ### 8. Monitoring & Logs
 
 **View logs**:
+
 ```bash
 # All services
 docker-compose logs -f
@@ -489,11 +510,13 @@ docker-compose logs --tail=100 api
 ```
 
 **Resource usage**:
+
 ```bash
 docker stats
 ```
 
 **Container status**:
+
 ```bash
 docker-compose ps
 ```
@@ -501,6 +524,7 @@ docker-compose ps
 ### 9. Backup Strategy
 
 **Database backup** (`scripts/backup-db.sh`):
+
 ```bash
 #!/bin/bash
 DATE=$(date +%Y%m%d_%H%M%S)
@@ -512,6 +536,7 @@ echo "Database backed up to $BACKUP_DIR/db_$DATE.sql"
 ```
 
 **MinIO backup**:
+
 ```bash
 #!/bin/bash
 DATE=$(date +%Y%m%d_%H%M%S)
@@ -545,29 +570,34 @@ docker run --rm \
 Test complete deployment:
 
 1. **Services running**:
+
 ```bash
 docker-compose ps
 # All services should be "Up" and healthy
 ```
 
 2. **API accessible**:
+
 ```bash
 curl http://localhost:3001/health
 curl http://localhost:3001/api/videos/list
 ```
 
 3. **Web accessible**:
+
 ```bash
 open http://localhost:3000
 ```
 
 4. **Upload flow works**:
+
 - Upload a video via web UI
 - Check worker processes it
 - Verify output in MinIO
 - Play video in player
 
 5. **Live streaming works**:
+
 - Create live stream
 - Start camera stream
 - View in player
@@ -604,23 +634,27 @@ open http://localhost:3000
 ## Troubleshooting
 
 **Services not starting**:
+
 ```bash
 docker-compose logs <service-name>
 docker-compose restart <service-name>
 ```
 
 **Database connection issues**:
+
 ```bash
 docker-compose exec postgres psql -U admin -d streaming_video
 ```
 
 **MinIO access issues**:
+
 ```bash
 docker-compose exec minio mc alias set local http://localhost:9000 admin password
 docker-compose exec minio mc ls local
 ```
 
 **Worker not processing**:
+
 ```bash
 docker-compose logs -f worker
 docker-compose exec rabbitmq rabbitmqctl list_queues

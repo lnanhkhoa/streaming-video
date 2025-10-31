@@ -27,6 +27,9 @@ out/
 build
 dist
 
+# Prisma
+node_modules/.prisma
+
 
 # Debug
 npm-debug.log*
@@ -39,3 +42,17 @@ yarn-error.log*
 logs.txt
 repomix-output.xml
 .serena/cache
+
+# Claude + Plans
+screenshots/*
+docs/*
+docs/screenshots/*
+docs/journals/*
+docs/research/*
+
+plans/templates/*
+.claude/agents/*
+.claude/commands/*
+.claude/hooks/*
+.claude/skills/*
+.claude/workflows/*

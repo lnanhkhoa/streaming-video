@@ -14,6 +14,7 @@ Build Hono API with 4 route modules: videos, upload, live, analytics. No authent
 ### 1. Project Structure
 
 Create in `apps/api/src/`:
+
 ```
 src/
 ├── index.ts              # Entry point
@@ -43,6 +44,7 @@ src/
 ### 2. Update Dependencies
 
 **`apps/api/package.json`**:
+
 ```json
 {
   "dependencies": {
@@ -62,6 +64,7 @@ src/
 ### 3. Core Setup
 
 **`src/app.ts`**:
+
 ```typescript
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
@@ -94,6 +97,7 @@ export { app }
 Reference detailed plan section 3 for full implementations:
 
 **Priority Order**:
+
 1. `videos.ts` - GET /list, GET /:id, DELETE /:id
 2. `upload.ts` - POST /presign, POST /:id/complete
 3. `analytics.ts` - POST /view/:id, GET /stats/:id
@@ -102,6 +106,7 @@ Reference detailed plan section 3 for full implementations:
 ### 5. Implement Services
 
 **`services/storage.service.ts`** (MinIO):
+
 - getPresignedUploadUrl()
 - getPresignedDownloadUrl()
 - fileExists()
@@ -109,17 +114,21 @@ Reference detailed plan section 3 for full implementations:
 - downloadFile()
 
 **`services/queue.service.ts`** (RabbitMQ):
+
 - publishTranscodeJob()
 
 **`services/cache.service.ts`** (Redis):
+
 - get(), set(), del(), exists()
 
 **`services/analytics.service.ts`**:
+
 - trackView()
 - resetDailyViews()
 - resetMonthlyViews()
 
 **`services/live.service.ts`**:
+
 - handleWebRTCSignal()
 - startRTMPIngest() (optional)
 - stopStream()
@@ -128,6 +137,7 @@ Reference detailed plan section 3 for full implementations:
 ### 6. Environment Variables
 
 Add to `.env`:
+
 ```env
 # API
 PORT=3001
@@ -151,6 +161,7 @@ MINIO_SECRET_KEY=password
 ### 7. Start Dependencies
 
 Update `docker-compose.dev.yml`:
+
 ```yaml
 services:
   postgres:
@@ -160,7 +171,7 @@ services:
     image: redis:7-alpine
     command: redis-server --requirepass password
     ports:
-      - "6379:6379"
+      - '6379:6379'
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -168,8 +179,8 @@ services:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: password
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - '5672:5672'
+      - '15672:15672'
 
   minio:
     image: minio/minio:latest
@@ -178,8 +189,8 @@ services:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: password
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - '9000:9000'
+      - '9001:9001'
     volumes:
       - minio_data:/data
 
@@ -189,6 +200,7 @@ volumes:
 ```
 
 Start services:
+
 ```bash
 docker-compose -f docker-compose.dev.yml up -d
 ```
@@ -196,6 +208,7 @@ docker-compose -f docker-compose.dev.yml up -d
 ### 8. Testing
 
 Test each route with curl or Postman:
+
 ```bash
 # Health check
 curl http://localhost:3001/health

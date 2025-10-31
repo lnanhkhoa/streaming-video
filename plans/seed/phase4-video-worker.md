@@ -14,6 +14,7 @@ Build FFmpeg transcoding worker with HLS output (3 variants: 480p, 720p, 1080p) 
 ### 1. Project Structure
 
 Create in `apps/worker/src/`:
+
 ```
 src/
 ├── index.ts              # Entry point
@@ -29,12 +30,14 @@ src/
 ### 2. Install FFmpeg
 
 **Docker approach** (for consistency):
+
 ```dockerfile
 # In worker container
 RUN apk add --no-cache ffmpeg
 ```
 
 **Local development**:
+
 ```bash
 # macOS
 brew install ffmpeg
@@ -44,6 +47,7 @@ sudo apt-get install ffmpeg
 ```
 
 Verify:
+
 ```bash
 ffmpeg -version
 ```
@@ -53,6 +57,7 @@ ffmpeg -version
 **`src/transcoder.ts`**:
 
 Key features:
+
 - Input: Video file from MinIO
 - Output: HLS with 3 variants (480p, 720p, 1080p)
 - Generate thumbnail
@@ -60,6 +65,7 @@ Key features:
 - Upload all to MinIO
 
 HLS variants:
+
 ```typescript
 const HLS_VARIANTS = [
   { resolution: '1080p', width: 1920, height: 1080, bitrate: 5000 },
@@ -69,6 +75,7 @@ const HLS_VARIANTS = [
 ```
 
 FFmpeg command example:
+
 ```bash
 ffmpeg -i input.mp4 \
   -c:v libx264 -preset medium -crf 23 \
@@ -87,6 +94,7 @@ Reference detailed plan section 4.2 for complete implementation.
 **`src/consumer.ts`**:
 
 Flow:
+
 1. Connect to RabbitMQ
 2. Assert queue 'video-transcode'
 3. Consume messages
@@ -95,6 +103,7 @@ Flow:
 6. Ack/Nack message
 
 Job structure:
+
 ```typescript
 interface TranscodeJob {
   videoId: string
@@ -107,6 +116,7 @@ interface TranscodeJob {
 **`src/live-stream.ts`**:
 
 Features:
+
 - Receive WebRTC stream
 - Convert to HLS segments in real-time
 - Upload segments to MinIO continuously
@@ -115,6 +125,7 @@ Features:
 **`src/hls-packager.ts`**:
 
 FFmpeg for live:
+
 ```bash
 ffmpeg -i rtmp://input \
   -c:v libx264 -preset veryfast -tune zerolatency \
@@ -174,6 +185,7 @@ main().catch((error) => {
 ### 8. Error Handling
 
 Important cases:
+
 - FFmpeg process fails
 - MinIO upload fails
 - RabbitMQ disconnects
@@ -185,6 +197,7 @@ Update video status to 'FAILED' on error.
 ### 9. Testing
 
 **Test transcode job**:
+
 ```typescript
 // In api, trigger manually
 import { queueService } from './services/queue.service'
@@ -196,6 +209,7 @@ await queueService.publishTranscodeJob({
 ```
 
 **Monitor worker**:
+
 ```bash
 # Watch worker logs
 cd apps/worker
@@ -207,6 +221,7 @@ open http://localhost:15672
 ```
 
 **Verify output**:
+
 - Check MinIO console: http://localhost:9001
 - Files should appear in `videos/{videoId}/` folder
 - master.m3u8, 480p/, 720p/, 1080p/, thumbnail.jpg
@@ -214,6 +229,7 @@ open http://localhost:15672
 ### 10. Environment Variables
 
 Add to `.env`:
+
 ```env
 # Worker
 WORKER_CONCURRENCY=1
@@ -225,6 +241,7 @@ FFMPEG_CRF=23
 ## Verification
 
 Test complete flow:
+
 1. Upload video via API
 2. Worker picks up job
 3. FFmpeg transcodes to HLS

@@ -17,6 +17,7 @@ Set up MinIO (object storage) and Redis (caching). Create service wrappers for A
 Already in `docker-compose.dev.yml` from Phase 3.
 
 **First time setup**:
+
 ```bash
 # Start MinIO
 docker-compose -f docker-compose.dev.yml up -d minio
@@ -30,10 +31,12 @@ open http://localhost:9001
 ```
 
 **Create bucket**:
+
 - Name: `streaming-video`
 - Access: Private (use presigned URLs)
 
 Or via code:
+
 ```typescript
 import { Client } from 'minio'
 
@@ -143,11 +146,13 @@ export const storageService = new StorageService()
 Already in `docker-compose.dev.yml` from Phase 3.
 
 **Start Redis**:
+
 ```bash
 docker-compose -f docker-compose.dev.yml up -d redis
 ```
 
 **Test connection**:
+
 ```bash
 redis-cli -h localhost -p 6379 -a password
 > ping
@@ -225,6 +230,7 @@ export const cacheService = new CacheService()
 Already in `docker-compose.dev.yml` from Phase 3.
 
 **Start RabbitMQ**:
+
 ```bash
 docker-compose -f docker-compose.dev.yml up -d rabbitmq
 
@@ -265,6 +271,7 @@ export const queueService = new QueueService()
 ```
 
 Initialize in API startup:
+
 ```typescript
 // apps/api/src/index.ts
 import { queueService } from './services/queue.service'
@@ -275,6 +282,7 @@ await queueService.connect()
 ### 6. Testing
 
 **Test MinIO**:
+
 ```typescript
 import { storageService } from './services/storage.service'
 
@@ -291,6 +299,7 @@ console.log('Exists:', exists)
 ```
 
 **Test Redis**:
+
 ```typescript
 import { cacheService } from './services/cache.service'
 
@@ -300,6 +309,7 @@ console.log('Cached value:', value)
 ```
 
 **Test RabbitMQ**:
+
 ```typescript
 import { queueService } from './services/queue.service'
 

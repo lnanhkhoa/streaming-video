@@ -16,11 +16,13 @@ Create Prisma schema for MVP: Video, VideoVariant, VideoViewLog models. No authe
 **Location**: `packages/@repo/database/prisma/schema.prisma`
 
 Copy from detailed plan section 2.2. Key models:
+
 - **Video**: Main video entity (VOD + LIVE support)
 - **VideoVariant**: Quality variants (480p, 720p, 1080p)
 - **VideoViewLog**: View tracking logs
 
 **Important fields**:
+
 ```prisma
 model Video {
   videoType      VideoType      @default(VOD)  // VOD or LIVE
@@ -36,6 +38,7 @@ model Video {
 ### 2. Environment Configuration
 
 **Create** `.env`:
+
 ```env
 DATABASE_URL="postgresql://admin:password@localhost:5432/streaming_video"
 ```
@@ -43,6 +46,7 @@ DATABASE_URL="postgresql://admin:password@localhost:5432/streaming_video"
 ### 3. Setup PostgreSQL
 
 **Docker Compose** (create `docker-compose.dev.yml`):
+
 ```yaml
 version: '3.9'
 
@@ -54,11 +58,11 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin"]
+      test: ['CMD-SHELL', 'pg_isready -U admin']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -68,6 +72,7 @@ volumes:
 ```
 
 Start database:
+
 ```bash
 docker-compose -f docker-compose.dev.yml up -d postgres
 ```
@@ -90,6 +95,7 @@ bun run db:studio
 ### 5. Create Prisma Client Export
 
 **`packages/@repo/database/index.ts`**:
+
 ```typescript
 import { PrismaClient } from '@prisma/client'
 
@@ -100,7 +106,7 @@ const globalForPrisma = globalThis as unknown as {
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error']
   })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
@@ -109,6 +115,7 @@ export * from '@prisma/client'
 ```
 
 Update `packages/@repo/database/package.json`:
+
 ```json
 {
   "main": "./index.ts",
@@ -122,6 +129,7 @@ Update `packages/@repo/database/package.json`:
 ### 6. Optional: Seed Data
 
 **`packages/@repo/database/prisma/seed.ts`**:
+
 ```typescript
 import { PrismaClient } from '@prisma/client'
 
@@ -165,6 +173,7 @@ main()
 ```
 
 Add to package.json:
+
 ```json
 {
   "scripts": {
@@ -174,6 +183,7 @@ Add to package.json:
 ```
 
 Run seed:
+
 ```bash
 bun run db:seed
 ```
@@ -181,6 +191,7 @@ bun run db:seed
 ## Verification
 
 Test database connection:
+
 ```typescript
 // Test file: test-db.ts
 import { prisma } from '@repo/database'
@@ -194,6 +205,7 @@ test()
 ```
 
 Run:
+
 ```bash
 bun test-db.ts
 ```

@@ -1,10 +1,10 @@
 import { Hono } from 'hono'
-import { CONSTANT } from '@repo/constants'
+import { HELLO_WORLD } from '@repo/constants'
 
 const app = new Hono()
 
 app.get('/', (c) => {
-  return c.text(CONSTANT)
+  return c.text(HELLO_WORLD)
 })
 
 export default app

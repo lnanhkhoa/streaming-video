@@ -2,15 +2,21 @@
   "name": "api",
   "type": "module",
   "scripts": {
-    "dev": "srvx"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "hono": "^4.8.10",
-    "@repo/constants": "*"
+    "@repo/constants": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
-    "srvx": "^0.8.7",
-    "typescript": "^5.8.3"
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.3",
+    "eslint": "^9.31.0"
   }
 }

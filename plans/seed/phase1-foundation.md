@@ -14,17 +14,18 @@ Set up monorepo structure, package configuration, and development tooling.
 ### 1. Monorepo Structure
 
 Create packages structure:
+
 ```bash
 packages/
-├── @repo/constants/     # Constants
-├── @repo/database/      # Prisma schema + client
-├── @repo/types/         # Shared TypeScript types
-├── @repo/utils/         # Shared utilities
-├── @repo/eslint-config/ # ESLint configs (existing)
-└── @repo/typescript-config/ # TS configs (existing)
+├── constants/     # Constants
+├── database/      # Prisma schema + client
+├── utils/         # Shared utilities
+├── eslint-config/ # ESLint configs (existing)
+└── typescript-config/ # TS configs (existing)
 ```
 
 Create apps structure:
+
 ```bash
 apps/
 ├── api/      # Hono backend (existing)
@@ -34,7 +35,8 @@ apps/
 
 ### 2. Package Configuration
 
-**`packages/@repo/database/package.json`**:
+**`packages/database/package.json`**:
+
 ```json
 {
   "name": "@repo/database",
@@ -55,18 +57,8 @@ apps/
 }
 ```
 
-**`packages/@repo/types/package.json`**:
-```json
-{
-  "name": "@repo/types",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./index.ts",
-  "types": "./index.ts"
-}
-```
+**`packages/utils/package.json`**:
 
-**`packages/@repo/utils/package.json`**:
 ```json
 {
   "name": "@repo/utils",
@@ -80,6 +72,7 @@ apps/
 ### 3. Worker App Setup
 
 **`apps/worker/package.json`**:
+
 ```json
 {
   "name": "worker",
@@ -111,6 +104,7 @@ apps/
 ### 4. Update Turbo Configuration
 
 **`turbo.json`**:
+
 ```json
 {
   "$schema": "https://turbo.build/schema.json",
@@ -146,13 +140,11 @@ apps/
 ### 5. Update Root package.json
 
 Add workspace references and scripts:
+
 ```json
 {
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
@@ -167,7 +159,8 @@ Add workspace references and scripts:
 
 ### 6. Create Placeholder Files
 
-**`packages/@repo/types/index.ts`**:
+**`packages/types/index.ts`**:
+
 ```typescript
 // Shared TypeScript types
 export interface Video {
@@ -182,14 +175,15 @@ export type VideoType = 'VOD' | 'LIVE'
 export type VideoVisibility = 'PUBLIC' | 'UNLISTED' | 'PRIVATE'
 ```
 
-**`packages/@repo/utils/index.ts`**:
+**`packages/utils/index.ts`**:
+
 ```typescript
 // Shared utility functions
 export function formatFileSize(bytes: number): string {
   const sizes = ['Bytes', 'KB', 'MB', 'GB']
   if (bytes === 0) return '0 Bytes'
   const i = Math.floor(Math.log(bytes) / Math.log(1024))
-  return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i]
+  return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + ' ' + sizes[i]
 }
 
 export function formatDuration(seconds: number): string {
@@ -203,6 +197,7 @@ export function formatDuration(seconds: number): string {
 ```
 
 **`apps/worker/src/index.ts`**:
+
 ```typescript
 console.log('Worker starting...')
 
@@ -212,6 +207,7 @@ console.log('Worker starting...')
 ## Verification
 
 Run these commands to verify setup:
+
 ```bash
 # Install dependencies
 bun install

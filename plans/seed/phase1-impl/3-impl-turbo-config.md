@@ -6,15 +6,19 @@
 **Context Tokens**: Configure Turborepo pipeline for efficient builds, dev mode, and database tasks across monorepo workspaces.
 
 ## Executive Summary
+
 Update Turborepo configuration to support all workspace packages and applications with optimized caching, task dependencies, and parallel execution for maximum development velocity.
 
 ## Context Links
+
 - **Related Plans**: `plans/251031-phase1-foundation.md`
-- **Dependencies**: All workspace packages (@repo/*), all apps (api, web, worker)
+- **Dependencies**: All workspace packages (@repo/database, @repo/utils, @repo/constants), all apps (api, web, worker)
 - **Reference Docs**: https://turbo.build/repo/docs
 
 ## Requirements
+
 ### Functional Requirements
+
 - [ ] Build pipeline with proper dependencies
 - [ ] Dev mode with persistent tasks
 - [ ] Database tasks (generate, migrate, push, studio)
@@ -23,6 +27,7 @@ Update Turborepo configuration to support all workspace packages and application
 - [ ] Root package.json scripts
 
 ### Non-Functional Requirements
+
 - [ ] Fast builds with aggressive caching
 - [ ] Parallel execution where possible
 - [ ] No unnecessary rebuilds
@@ -39,6 +44,7 @@ Root
 ```
 
 ### Key Components
+
 - **Build Pipeline**: Handles package builds with dependency order
 - **Dev Pipeline**: Runs multiple dev servers concurrently
 - **Database Pipeline**: Prisma tasks with cache invalidation
@@ -47,9 +53,11 @@ Root
 ## Implementation Phases
 
 ### Phase 1: Turbo Pipeline Configuration (Est: 0.5 days)
+
 **Scope**: Configure turbo.json with all task definitions
 
 **Tasks**:
+
 1. [ ] Update turbo.json - file: `turbo.json`
 2. [ ] Define build task with outputs
 3. [ ] Define dev task (persistent, no cache)
@@ -58,6 +66,7 @@ Root
 6. [ ] Configure task dependencies
 
 **Acceptance Criteria**:
+
 - [ ] `turbo build` builds all packages in correct order
 - [ ] `turbo dev` runs all dev servers concurrently
 - [ ] Database tasks don't cache inappropriately
@@ -66,25 +75,16 @@ Root
 **Files to Update**:
 
 `turbo.json`:
+
 ```json
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDependencies": [
-    ".env",
-    "tsconfig.json"
-  ],
+  "globalDependencies": [".env", "tsconfig.json"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**"
-      ],
-      "env": [
-        "NODE_ENV",
-        "NEXT_PUBLIC_API_URL"
-      ]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "env": ["NODE_ENV", "NEXT_PUBLIC_API_URL"]
     },
     "dev": {
       "cache": false,
@@ -106,19 +106,11 @@ Root
     "test": {
       "dependsOn": ["build"],
       "outputs": [],
-      "inputs": [
-        "src/**/*.ts",
-        "src/**/*.tsx",
-        "test/**/*.ts",
-        "test/**/*.tsx"
-      ]
+      "inputs": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts", "test/**/*.tsx"]
     },
     "db:generate": {
       "cache": false,
-      "outputs": [
-        "node_modules/.prisma/**",
-        "node_modules/@prisma/client/**"
-      ]
+      "outputs": ["node_modules/.prisma/**", "node_modules/@prisma/client/**"]
     },
     "db:migrate": {
       "cache": false
@@ -137,23 +129,23 @@ Root
       "cache": false
     }
   },
-  "globalEnv": [
-    "DATABASE_URL",
-    "NODE_ENV"
-  ]
+  "globalEnv": ["DATABASE_URL", "NODE_ENV"]
 }
 ```
 
 ### Phase 2: Root Package Scripts (Est: 0.25 days)
+
 **Scope**: Add convenient npm scripts to root package.json
 
 **Tasks**:
+
 1. [ ] Update root package.json - file: `package.json`
 2. [ ] Add turbo task wrappers
 3. [ ] Add convenience scripts
 4. [ ] Add workspace management scripts
 
 **Acceptance Criteria**:
+
 - [ ] All tasks executable from root
 - [ ] Scripts follow consistent naming
 - [ ] Can target specific workspaces
@@ -161,14 +153,12 @@ Root
 **Files to Update**:
 
 `package.json`:
+
 ```json
 {
   "name": "streaming-video",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/@repo/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "turbo dev",
     "dev:api": "turbo dev --filter=api",
@@ -210,14 +200,17 @@ Root
 ```
 
 ### Phase 3: App-Specific Scripts (Est: 0.25 days)
+
 **Scope**: Ensure all apps have consistent npm scripts
 
 **Tasks**:
+
 1. [ ] Update apps/api/package.json scripts
 2. [ ] Update apps/web/package.json scripts
 3. [ ] Verify apps/worker/package.json scripts
 
 **Acceptance Criteria**:
+
 - [ ] All apps have dev, build, start, lint, typecheck scripts
 - [ ] Scripts follow same pattern across apps
 - [ ] Turbo can discover and run all scripts
@@ -225,6 +218,7 @@ Root
 **Files to Update**:
 
 `apps/api/package.json` (verify these scripts exist):
+
 ```json
 {
   "scripts": {
@@ -238,6 +232,7 @@ Root
 ```
 
 `apps/web/package.json` (verify these scripts exist):
+
 ```json
 {
   "scripts": {
@@ -251,6 +246,7 @@ Root
 ```
 
 `apps/worker/package.json` (already created in previous plan):
+
 ```json
 {
   "scripts": {
@@ -263,12 +259,15 @@ Root
 ```
 
 ### Phase 4: .gitignore Updates (Est: 0.1 days)
+
 **Scope**: Add Turbo cache to .gitignore
 
 **Tasks**:
+
 1. [ ] Update .gitignore - file: `.gitignore`
 
 **Acceptance Criteria**:
+
 - [ ] Turbo cache ignored
 - [ ] Build outputs ignored
 - [ ] No cache committed to git
@@ -276,6 +275,7 @@ Root
 **Files to Update**:
 
 `.gitignore` (add these lines):
+
 ```gitignore
 # Turbo
 .turbo
@@ -295,25 +295,30 @@ node_modules/.prisma
 ```
 
 ## Testing Strategy
+
 - **Build Tests**: Run `bun turbo build` from clean state
 - **Dev Tests**: Start all dev servers with `bun turbo dev`
 - **Cache Tests**: Build twice, verify second build uses cache
 - **Dependency Tests**: Change package, verify dependent apps rebuild
 
 ## Security Considerations
+
 - [ ] No secrets in turbo.json
 - [ ] Environment variables properly scoped
 - [ ] Cache doesn't leak sensitive data
 
 ## Risk Assessment
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Cache invalidation issues | Medium | Use globalDependencies for critical files |
-| Parallel task conflicts | Low | Use task dependencies to enforce order |
-| Missing outputs | Low | Test builds thoroughly, add all output dirs |
+
+| Risk                      | Impact | Mitigation                                  |
+| ------------------------- | ------ | ------------------------------------------- |
+| Cache invalidation issues | Medium | Use globalDependencies for critical files   |
+| Parallel task conflicts   | Low    | Use task dependencies to enforce order      |
+| Missing outputs           | Low    | Test builds thoroughly, add all output dirs |
 
 ## Quick Reference
+
 ### Key Commands
+
 ```bash
 # Build all apps and packages
 bun turbo build
@@ -344,11 +349,13 @@ bun turbo build --graph
 ```
 
 ### Configuration Files
+
 - `turbo.json`: Pipeline configuration
 - `package.json`: Root scripts
 - `.turbo/`: Cache directory (ignored by git)
 
 ## TODO Checklist
+
 - [ ] Update turbo.json with all task definitions
 - [ ] Configure build task with outputs
 - [ ] Configure dev task (persistent, no cache)
@@ -368,12 +375,14 @@ bun turbo build --graph
 - [ ] Commit changes to git
 
 ## Performance Targets
+
 - **First build**: < 2 minutes (all packages + apps)
 - **Cached build**: < 10 seconds
 - **Dev server start**: < 30 seconds
 - **Database generate**: < 5 seconds
 
 ## Notes
+
 - Turbo automatically detects changed files
 - Use `--force` to bypass cache
 - Use `--filter` to target specific workspaces
@@ -384,13 +393,17 @@ bun turbo build --graph
 ## Troubleshooting
 
 **Issue**: Build doesn't use cache
+
 - **Solution**: Check `outputs` includes all build artifacts
 
 **Issue**: Dev servers don't start
+
 - **Solution**: Verify `persistent: true` and `cache: false` on dev task
 
 **Issue**: Database generate runs too often
+
 - **Solution**: Check `outputs` includes `node_modules/.prisma/**`
 
 **Issue**: Tasks run in wrong order
+
 - **Solution**: Add `dependsOn` to enforce dependencies

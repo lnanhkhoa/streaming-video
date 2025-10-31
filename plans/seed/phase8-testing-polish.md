@@ -16,6 +16,7 @@ Comprehensive testing, error handling, loading states, responsive design, and fi
 #### 1.1 API Error Handling
 
 **Update `apps/api/src/middlewares/error.ts`**:
+
 ```typescript
 import { Context } from 'hono'
 import { ZodError } from 'zod'
@@ -25,13 +26,16 @@ export function errorHandler(err: Error, c: Context) {
 
   // Zod validation errors
   if (err instanceof ZodError) {
-    return c.json({
-      error: 'Validation failed',
-      details: err.errors.map(e => ({
-        field: e.path.join('.'),
-        message: e.message
-      }))
-    }, 400)
+    return c.json(
+      {
+        error: 'Validation failed',
+        details: err.errors.map((e) => ({
+          field: e.path.join('.'),
+          message: e.message
+        }))
+      },
+      400
+    )
   }
 
   // Known application errors
@@ -49,17 +53,19 @@ export function errorHandler(err: Error, c: Context) {
   }
 
   // Default error
-  return c.json({
-    error: process.env.NODE_ENV === 'production'
-      ? 'Internal server error'
-      : err.message
-  }, 500)
+  return c.json(
+    {
+      error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message
+    },
+    500
+  )
 }
 ```
 
 #### 1.2 Frontend Error Handling
 
 **Create `apps/web/components/ErrorBoundary.tsx`**:
+
 ```typescript
 'use client'
 
@@ -107,6 +113,7 @@ export class ErrorBoundary extends Component<Props, State> {
 ```
 
 **Update `apps/web/app/layout.tsx`**:
+
 ```typescript
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 
@@ -127,6 +134,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 #### 1.3 API Error Handling in Frontend
 
 **Update `apps/web/lib/api.ts`**:
+
 ```typescript
 class APIClient {
   async request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -166,6 +174,7 @@ class APIClient {
 #### 2.1 Skeleton Components
 
 **Create `apps/web/components/ui/skeleton.tsx`**:
+
 ```typescript
 import { cn } from '@/lib/utils'
 
@@ -183,6 +192,7 @@ export function Skeleton({
 ```
 
 **Create `apps/web/components/video/VideoCardSkeleton.tsx`**:
+
 ```typescript
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -200,6 +210,7 @@ export function VideoCardSkeleton() {
 #### 2.2 Loading Pages
 
 **Create `apps/web/app/loading.tsx`**:
+
 ```typescript
 import { VideoCardSkeleton } from '@/components/video/VideoCardSkeleton'
 
@@ -220,6 +231,7 @@ export default function Loading() {
 #### 2.3 Upload Progress
 
 **Update `apps/web/components/video/UploadForm.tsx`**:
+
 ```typescript
 'use client'
 
@@ -304,6 +316,7 @@ export function UploadForm() {
 #### 3.1 Mobile Optimization
 
 **Update `apps/web/app/page.tsx`**:
+
 ```typescript
 export default async function HomePage() {
   const videos = await api.get<Video[]>('/api/videos/list')
@@ -324,6 +337,7 @@ export default async function HomePage() {
 #### 3.2 Video Player Mobile
 
 **Update `apps/web/components/video/VideoPlayer.tsx`**:
+
 ```typescript
 export function VideoPlayer({ videoId, manifestUrl, isLive }: Props) {
   return (
@@ -343,6 +357,7 @@ export function VideoPlayer({ videoId, manifestUrl, isLive }: Props) {
 #### 3.3 Navigation Mobile
 
 **Update `apps/web/app/layout.tsx`**:
+
 ```typescript
 'use client'
 
@@ -400,6 +415,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 #### 4.1 Upload Validation
 
 **Update `apps/web/components/video/UploadForm.tsx`**:
+
 ```typescript
 const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024 // 2GB
 const ALLOWED_TYPES = ['video/mp4', 'video/webm', 'video/ogg']
@@ -422,12 +438,16 @@ const validateFile = (file: File) => {
 #### 4.2 API Validation
 
 **Create `apps/api/src/utils/validator.ts`**:
+
 ```typescript
 import { z } from 'zod'
 
 export const uploadSchema = z.object({
   fileName: z.string().min(1).max(255),
-  fileSize: z.number().min(1024).max(2 * 1024 * 1024 * 1024),
+  fileSize: z
+    .number()
+    .min(1024)
+    .max(2 * 1024 * 1024 * 1024),
   contentType: z.enum(['video/mp4', 'video/webm', 'video/ogg'])
 })
 
@@ -442,6 +462,7 @@ export const trackViewSchema = z.object({
 ```
 
 **Update routes to use validation**:
+
 ```typescript
 import { uploadSchema } from '../utils/validator'
 
@@ -534,6 +555,7 @@ Manual tests:
 #### 6.1 Load Testing
 
 **Simple load test script** `scripts/load-test.sh`:
+
 ```bash
 #!/bin/bash
 
@@ -553,6 +575,7 @@ echo "Load test complete"
 #### 6.2 Video Playback Testing
 
 Test on different devices:
+
 - Desktop Chrome
 - Desktop Safari
 - Desktop Firefox
@@ -561,6 +584,7 @@ Test on different devices:
 - iPad Safari
 
 Test scenarios:
+
 - Seek to different positions
 - Switch quality mid-playback
 - Play multiple videos in sequence
@@ -572,6 +596,7 @@ Test scenarios:
 #### 7.1 HLS.js Fallback
 
 **Update `apps/web/components/video/VideoPlayer.tsx`**:
+
 ```typescript
 useEffect(() => {
   if (!videoRef.current || !manifestUrl) return
@@ -598,6 +623,7 @@ useEffect(() => {
 #### 7.2 Camera API Fallback
 
 **Update `apps/web/components/live/CameraStream.tsx`**:
+
 ```typescript
 const startCamera = async () => {
   try {
@@ -632,6 +658,7 @@ const startCamera = async () => {
 #### 8.1 Empty States
 
 **Create `apps/web/components/EmptyState.tsx`**:
+
 ```typescript
 export function EmptyState({ message }: { message: string }) {
   return (
@@ -643,6 +670,7 @@ export function EmptyState({ message }: { message: string }) {
 ```
 
 **Use in pages**:
+
 ```typescript
 {videos.length === 0 && <EmptyState message="No videos yet" />}
 ```
@@ -650,6 +678,7 @@ export function EmptyState({ message }: { message: string }) {
 #### 8.2 Success Messages
 
 **Create toast notification** (optional, using sonner):
+
 ```bash
 bun add sonner
 ```
@@ -667,6 +696,7 @@ toast.error('Upload failed. Please try again.')
 #### 8.3 Favicon & Meta Tags
 
 **Update `apps/web/app/layout.tsx`**:
+
 ```typescript
 export const metadata = {
   title: 'StreamVideo - Self-hosted Streaming Platform',
@@ -682,6 +712,7 @@ export const metadata = {
 #### 9.1 README Updates
 
 Update main `README.md` with:
+
 - Quick start guide
 - Development setup
 - Production deployment
@@ -691,27 +722,32 @@ Update main `README.md` with:
 #### 9.2 API Documentation
 
 Create `docs/API.md`:
+
 ```markdown
 # API Documentation
 
 ## Endpoints
 
 ### Videos
+
 - GET `/api/videos/list` - List all videos
 - GET `/api/videos/:id` - Get video details
 - DELETE `/api/videos/:id` - Delete video
 
 ### Upload
+
 - POST `/api/upload/presign` - Get presigned upload URL
 - POST `/api/upload/:id/complete` - Mark upload complete
 
 ### Live
+
 - POST `/api/live/create` - Create live stream
 - POST `/api/live/:id/start` - Start streaming
 - POST `/api/live/:id/stop` - Stop streaming
 - POST `/api/live/:id/signal` - WebRTC signaling
 
 ### Analytics
+
 - POST `/api/analytics/view/:id` - Track view
 - GET `/api/analytics/stats/:id` - Get view stats
 ```

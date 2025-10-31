@@ -10,6 +10,7 @@
 ## Executive Summary
 
 Build full-stack self-hosted streaming video platform (MVP) with:
+
 - **Monorepo Structure**: Turborepo for workspace management
 - **Backend**: Hono API for high-performance server
 - **Frontend**: Next.js 14+ with React 19 for SSR/SSG
@@ -22,6 +23,7 @@ Build full-stack self-hosted streaming video platform (MVP) with:
 - **Deployment**: Docker + Docker Compose
 
 **MVP Simplifications**:
+
 - No authentication system (public access)
 - No user accounts or sessions
 - No watch progress tracking
@@ -60,12 +62,14 @@ streaming-video/
 ```
 
 **Implementation Steps**:
+
 1. Create new packages: `@repo/constants`, `@repo/database`, `@repo/types`, `@repo/utils`
 2. Create `apps/worker` for transcoding service
 3. Set up Docker infrastructure directories
 4. Update `turbo.json` with new workspace tasks
 
 **Turbo Pipeline Config** (`turbo.json`):
+
 ```json
 {
   "tasks": {
@@ -93,6 +97,7 @@ streaming-video/
 ### 1.2 Package Manager & Dependencies
 
 **Use Bun** (already in use based on `bun.lock`):
+
 ```bash
 bun install
 bun turbo dev --filter=api
@@ -102,6 +107,7 @@ bun turbo dev --filter=web
 **Core Dependencies**:
 
 `apps/api/package.json`:
+
 ```json
 {
   "dependencies": {
@@ -118,6 +124,7 @@ bun turbo dev --filter=web
 ```
 
 `apps/web/package.json`:
+
 ```json
 {
   "dependencies": {
@@ -133,6 +140,7 @@ bun turbo dev --filter=web
 ```
 
 `apps/worker/package.json`:
+
 ```json
 {
   "dependencies": {
@@ -151,6 +159,7 @@ bun turbo dev --filter=web
 ### 2.1 PostgreSQL Setup
 
 **Docker Compose Service**:
+
 ```yaml
 postgres:
   image: postgres:16-alpine
@@ -159,11 +168,11 @@ postgres:
     POSTGRES_USER: admin
     POSTGRES_PASSWORD: ${DB_PASSWORD}
   ports:
-    - "5432:5432"
+    - '5432:5432'
   volumes:
     - postgres_data:/var/lib/postgresql/data
   healthcheck:
-    test: ["CMD-SHELL", "pg_isready -U admin"]
+    test: ['CMD-SHELL', 'pg_isready -U admin']
     interval: 10s
     timeout: 5s
     retries: 5
@@ -275,6 +284,7 @@ model VideoViewLog {
 ```
 
 **Setup Commands**:
+
 ```bash
 # Generate Prisma client
 bun turbo db:generate
@@ -323,6 +333,7 @@ apps/api/src/
 ### 3.2 Core API Implementation
 
 **Entry Point** (`apps/api/src/index.ts`):
+
 ```typescript
 import { serve } from '@hono/node-server'
 import { app } from './app'
@@ -338,6 +349,7 @@ serve({
 ```
 
 **Hono App** (`apps/api/src/app.ts`):
+
 ```typescript
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
@@ -372,6 +384,7 @@ export { app }
 ### 3.3 Video Upload Flow (Simplified - No Auth)
 
 **Upload Route** (`apps/api/src/routes/upload.ts`):
+
 ```typescript
 import { Hono } from 'hono'
 import { storageService } from '../services/storage.service'
@@ -405,10 +418,7 @@ uploadRoutes.post('/presign', async (c) => {
   })
 
   // Generate presigned URL
-  const presignedUrl = await storageService.getPresignedUploadUrl(
-    video.originalKey!,
-    contentType
-  )
+  const presignedUrl = await storageService.getPresignedUploadUrl(video.originalKey!, contentType)
 
   return c.json({
     videoId: video.id,
@@ -457,6 +467,7 @@ export { uploadRoutes }
 ### 3.4 Video View Tracking
 
 **Analytics Route** (`apps/api/src/routes/analytics.ts`):
+
 ```typescript
 import { Hono } from 'hono'
 import { prisma } from '@repo/database'
@@ -502,6 +513,7 @@ export { analyticsRoutes }
 ```
 
 **Analytics Service** (`apps/api/src/services/analytics.service.ts`):
+
 ```typescript
 import { prisma } from '@repo/database'
 
@@ -571,6 +583,7 @@ apps/worker/src/
 ### 4.2 Transcoding Implementation
 
 **FFmpeg Transcoder** (`apps/worker/src/transcoder.ts`):
+
 ```typescript
 import ffmpeg from 'fluent-ffmpeg'
 import path from 'path'
@@ -620,7 +633,8 @@ export async function transcodeToHLS(options: TranscodeOptions): Promise<void> {
           '-b:a 128k',
           '-hls_time 6',
           '-hls_playlist_type vod',
-          '-hls_segment_filename', `${variantDir}/segment_%03d.ts`
+          '-hls_segment_filename',
+          `${variantDir}/segment_%03d.ts`
         ])
         .output(`${variantDir}/playlist.m3u8`)
         .on('end', () => resolve())
@@ -677,6 +691,7 @@ async function generateMasterPlaylist(outputDir: string, metadata: any): Promise
 ```
 
 **RabbitMQ Consumer** (`apps/worker/src/consumer.ts`):
+
 ```typescript
 import amqp from 'amqplib'
 import { transcodeToHLS } from './transcoder'
@@ -736,10 +751,7 @@ async function processTranscodeJob(job: any) {
     await transcodeToHLS({ inputPath, outputDir, videoId })
 
     // Upload all output files to MinIO
-    const uploadedFiles = await storageService.uploadDirectory(
-      outputDir,
-      `videos/${videoId}`
-    )
+    const uploadedFiles = await storageService.uploadDirectory(outputDir, `videos/${videoId}`)
 
     // Update database
     await prisma.video.update({
@@ -747,14 +759,14 @@ async function processTranscodeJob(job: any) {
       data: {
         status: 'READY',
         hlsManifestKey: `videos/${videoId}/master.m3u8`,
-        thumbnailUrl: uploadedFiles.find(f => f.includes('thumbnail'))
+        thumbnailUrl: uploadedFiles.find((f) => f.includes('thumbnail'))
       }
     })
 
     // Create variant records
     const variants = ['1080p', '720p', '480p']
     for (const resolution of variants) {
-      const playlistFile = uploadedFiles.find(f => f.includes(`${resolution}/playlist.m3u8`))
+      const playlistFile = uploadedFiles.find((f) => f.includes(`${resolution}/playlist.m3u8`))
       if (playlistFile) {
         await prisma.videoVariant.create({
           data: {
@@ -789,11 +801,13 @@ function getVariantBitrate(resolution: string): number {
 **Overview**: Enable users to stream from their device camera to audiences in real-time.
 
 **Architecture Components**:
+
 ```
 Host Device (Camera) → WebRTC/Media Stream → API Server → HLS Segments → MinIO → Audience Players
 ```
 
 **Worker Addition for Live Streaming** (`apps/worker/src/`):
+
 ```
 apps/worker/src/
 ├── live-stream.ts        # Live stream handler
@@ -807,6 +821,7 @@ apps/worker/src/
 **Step 1: Host Initiates Live Stream**
 
 **Live Route** (`apps/api/src/routes/live.ts`):
+
 ```typescript
 import { Hono } from 'hono'
 import { prisma } from '@repo/database'
@@ -912,6 +927,7 @@ export { liveRoutes }
 ```
 
 **Live Service** (`apps/api/src/services/live.service.ts`):
+
 ```typescript
 import { prisma } from '@repo/database'
 import { spawn } from 'child_process'
@@ -949,16 +965,26 @@ class LiveService {
 
     // FFmpeg command to receive RTMP and output HLS
     const ffmpeg = spawn('ffmpeg', [
-      '-i', `rtmp://localhost/live/${streamKey}`,
-      '-c:v', 'libx264',
-      '-c:a', 'aac',
-      '-preset', 'veryfast',
-      '-tune', 'zerolatency',
-      '-f', 'hls',
-      '-hls_time', '2',
-      '-hls_list_size', '10',
-      '-hls_flags', 'delete_segments+append_list',
-      '-hls_segment_filename', `${outputDir}/segment_%03d.ts`,
+      '-i',
+      `rtmp://localhost/live/${streamKey}`,
+      '-c:v',
+      'libx264',
+      '-c:a',
+      'aac',
+      '-preset',
+      'veryfast',
+      '-tune',
+      'zerolatency',
+      '-f',
+      'hls',
+      '-hls_time',
+      '2',
+      '-hls_list_size',
+      '10',
+      '-hls_flags',
+      'delete_segments+append_list',
+      '-hls_segment_filename',
+      `${outputDir}/segment_%03d.ts`,
       `${outputDir}/index.m3u8`
     ])
 
@@ -973,11 +999,7 @@ class LiveService {
     this.activeStreams.set(videoId, { ffmpeg, outputDir })
   }
 
-  private async watchAndUploadSegments(
-    videoId: string,
-    localDir: string,
-    s3Prefix: string
-  ) {
+  private async watchAndUploadSegments(videoId: string, localDir: string, s3Prefix: string) {
     // Watch directory for new .ts and .m3u8 files
     // Upload them to MinIO immediately
     // This ensures low latency for live viewers
@@ -1031,6 +1053,7 @@ export const liveService = new LiveService()
 #### 4.3.2 Complete Live Streaming Flow
 
 **1. Host Creates Live Stream**:
+
 ```typescript
 POST /api/live/create
 Body: { title: "My Live Stream", description: "..." }
@@ -1042,6 +1065,7 @@ Response: {
 ```
 
 **2. Host Starts Camera Stream (Browser)**:
+
 ```typescript
 // Frontend code
 const stream = await navigator.mediaDevices.getUserMedia({
@@ -1051,7 +1075,7 @@ const stream = await navigator.mediaDevices.getUserMedia({
 
 // Create WebRTC connection
 const pc = new RTCPeerConnection()
-stream.getTracks().forEach(track => pc.addTrack(track, stream))
+stream.getTracks().forEach((track) => pc.addTrack(track, stream))
 
 // Exchange SDP offers/answers with server
 const offer = await pc.createOffer()
@@ -1067,17 +1091,20 @@ await pc.setRemoteDescription(new RTCSessionDescription(answer))
 ```
 
 **3. Server Receives Stream & Packages to HLS**:
+
 - WebRTC connection receives media stream
 - FFmpeg converts stream to HLS segments
 - Segments uploaded to MinIO in real-time
 - HLS manifest updated continuously
 
 **4. Mark Stream as Live**:
+
 ```typescript
 POST /api/live/:videoId/start
 ```
 
 **5. Audiences Watch Live Stream**:
+
 ```typescript
 GET /api/videos/:videoId
 Returns: { isLiveNow: true, hlsManifestKey: "live/xyz/index.m3u8" }
@@ -1086,6 +1113,7 @@ Returns: { isLiveNow: true, hlsManifestKey: "live/xyz/index.m3u8" }
 ```
 
 **6. Host Stops Stream**:
+
 ```typescript
 POST /api/live/:videoId/stop
 
@@ -1099,6 +1127,7 @@ POST /api/live/:videoId/stop
 ### 5.1 MinIO Setup
 
 **Docker Compose**:
+
 ```yaml
 minio:
   image: minio/minio:latest
@@ -1107,18 +1136,19 @@ minio:
     MINIO_ROOT_USER: ${MINIO_ROOT_USER}
     MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
   ports:
-    - "9000:9000"    # API
-    - "9001:9001"    # Console
+    - '9000:9000' # API
+    - '9001:9001' # Console
   volumes:
     - minio_data:/data
   healthcheck:
-    test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
     interval: 30s
     timeout: 20s
     retries: 3
 ```
 
 **Storage Service** (`apps/api/src/services/storage.service.ts`):
+
 ```typescript
 import { Client } from 'minio'
 
@@ -1186,22 +1216,24 @@ export const storageService = new StorageService()
 ### 5.2 Redis Setup
 
 **Docker Compose**:
+
 ```yaml
 redis:
   image: redis:7-alpine
   command: redis-server --requirepass ${REDIS_PASSWORD}
   ports:
-    - "6379:6379"
+    - '6379:6379'
   volumes:
     - redis_data:/data
   healthcheck:
-    test: ["CMD", "redis-cli", "ping"]
+    test: ['CMD', 'redis-cli', 'ping']
     interval: 10s
     timeout: 5s
     retries: 5
 ```
 
 **Cache Service** (`apps/api/src/services/cache.service.ts`):
+
 ```typescript
 import Redis from 'ioredis'
 
@@ -1245,6 +1277,7 @@ export const cacheService = new CacheService()
 ### 5.3 RabbitMQ Setup
 
 **Docker Compose**:
+
 ```yaml
 rabbitmq:
   image: rabbitmq:3-management-alpine
@@ -1252,12 +1285,12 @@ rabbitmq:
     RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
     RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
   ports:
-    - "5672:5672"    # AMQP
-    - "15672:15672"  # Management UI
+    - '5672:5672' # AMQP
+    - '15672:15672' # Management UI
   volumes:
     - rabbitmq_data:/var/lib/rabbitmq
   healthcheck:
-    test: ["CMD", "rabbitmq-diagnostics", "ping"]
+    test: ['CMD', 'rabbitmq-diagnostics', 'ping']
     interval: 30s
     timeout: 10s
     retries: 5
@@ -1311,6 +1344,7 @@ apps/web/
 ### 6.2 Video Player Component
 
 **HLS Player with View Tracking** (`apps/web/components/video/VideoPlayer.tsx`):
+
 ```typescript
 'use client'
 
@@ -1430,6 +1464,7 @@ export function VideoPlayer({ videoId, manifestUrl, isLive = false }: VideoPlaye
 ```
 
 **Video Stats Component** (`apps/web/components/video/VideoStats.tsx`):
+
 ```typescript
 'use client'
 
@@ -1490,6 +1525,7 @@ export function VideoStats({ videoId }: VideoStatsProps) {
 ### 6.3 Upload Flow
 
 **Upload Form** (`apps/web/components/video/UploadForm.tsx`):
+
 ```typescript
 'use client'
 
@@ -1570,6 +1606,7 @@ export function UploadForm() {
 ### 6.4 Live Streaming Components
 
 **Camera Stream Component** (`apps/web/components/live/CameraStream.tsx`):
+
 ```typescript
 'use client'
 
@@ -1642,6 +1679,7 @@ export function CameraStream({ videoId, onStreamReady }: CameraStreamProps) {
 ```
 
 **Stream Controls** (`apps/web/components/live/StreamControls.tsx`):
+
 ```typescript
 'use client'
 
@@ -1729,6 +1767,7 @@ export function StreamControls({ stream, onStartStream, onStopStream }: StreamCo
 ### 7.1 Complete Docker Compose
 
 **docker-compose.yml**:
+
 ```yaml
 version: '3.9'
 
@@ -1741,11 +1780,11 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin"]
+      test: ['CMD-SHELL', 'pg_isready -U admin']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -1755,11 +1794,11 @@ services:
     image: redis:7-alpine
     command: redis-server --requirepass ${REDIS_PASSWORD}
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -1771,12 +1810,12 @@ services:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - '5672:5672'
+      - '15672:15672'
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
       interval: 30s
       timeout: 10s
       retries: 5
@@ -1789,12 +1828,12 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - '9000:9000'
+      - '9001:9001'
     volumes:
       - minio_data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
       interval: 30s
       timeout: 20s
       retries: 3
@@ -1814,7 +1853,7 @@ services:
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
     ports:
-      - "3001:3001"
+      - '3001:3001'
     depends_on:
       postgres:
         condition: service_healthy
@@ -1844,7 +1883,7 @@ services:
       minio:
         condition: service_healthy
     deploy:
-      replicas: 2  # Scale workers
+      replicas: 2 # Scale workers
 
   # Web
   web:
@@ -1854,7 +1893,7 @@ services:
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:3001
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - api
 
@@ -1868,6 +1907,7 @@ volumes:
 ### 7.2 Dockerfiles
 
 **API Dockerfile** (`docker/api.Dockerfile`):
+
 ```dockerfile
 FROM node:20-alpine AS base
 
@@ -1899,6 +1939,7 @@ CMD ["node", "apps/api/dist/index.js"]
 ```
 
 **Worker Dockerfile** (`docker/worker.Dockerfile`):
+
 ```dockerfile
 FROM node:20-alpine AS base
 
@@ -1940,6 +1981,7 @@ CMD ["node", "apps/worker/dist/index.js"]
 ### 8.1 Local Development
 
 **Start all services**:
+
 ```bash
 # Start infrastructure
 docker-compose up -d postgres redis rabbitmq minio
@@ -1952,6 +1994,7 @@ bun turbo dev
 ```
 
 **Individual services**:
+
 ```bash
 # API only
 bun turbo dev --filter=api
@@ -1966,6 +2009,7 @@ bun turbo dev --filter=worker
 ### 8.2 Environment Variables (MVP Simplified)
 
 **.env.example**:
+
 ```env
 # Database
 DATABASE_URL=postgresql://admin:password@localhost:5432/streaming_video
@@ -2005,17 +2049,20 @@ RTMP_INGEST_URL=rtmp://localhost:1935
 ## Implementation Phases Summary (MVP)
 
 ### Phase 1: Foundation (Week 1)
+
 - ✅ Monorepo structure
 - ✅ Package setup
 - ✅ Docker Compose infrastructure
 
 ### Phase 2: Database (Week 1)
+
 - ✅ Simplified Prisma schema (no auth)
 - ✅ Video view tracking models
 - ✅ Live streaming fields
 - ✅ Migrations
 
 ### Phase 3: Backend Core (Week 2)
+
 - ✅ Hono API setup (no auth)
 - ✅ Video CRUD endpoints
 - ✅ Upload flow (presigned URLs)
@@ -2023,6 +2070,7 @@ RTMP_INGEST_URL=rtmp://localhost:1935
 - ✅ Live streaming endpoints
 
 ### Phase 4: Video Processing (Week 2-3)
+
 - ✅ Worker setup
 - ✅ FFmpeg integration
 - ✅ HLS transcoding (VOD)
@@ -2031,12 +2079,14 @@ RTMP_INGEST_URL=rtmp://localhost:1935
 - ✅ WebRTC signaling for browser streaming
 
 ### Phase 5: Storage & Cache (Week 3)
+
 - ✅ MinIO integration
 - ✅ Presigned URLs
 - ✅ Real-time segment upload
 - ✅ Redis caching
 
 ### Phase 6: Frontend (Week 4)
+
 - ✅ Next.js app (no auth pages)
 - ✅ Video player (VOD + Live)
 - ✅ Upload UI
@@ -2046,11 +2096,13 @@ RTMP_INGEST_URL=rtmp://localhost:1935
 - ✅ Browse/Search
 
 ### Phase 7: Deployment (Week 5)
+
 - ✅ Production builds
 - ✅ Docker optimization
 - ✅ Environment configs
 
 ### Phase 8: Testing & Polish (Week 5)
+
 - ✅ Error handling
 - ✅ Loading states
 - ✅ Responsive design
@@ -2062,10 +2114,12 @@ RTMP_INGEST_URL=rtmp://localhost:1935
 ## Unresolved Questions (MVP Scope)
 
 ### Resolved for MVP
+
 - ~~**Live Streaming**~~: ✅ Included with WebRTC + RTMP options
 - ~~**Analytics**~~: ✅ Basic view tracking (daily/monthly/total)
 
 ### Future Considerations
+
 1. **CDN**: Use NGINX caching layer or external CDN (Cloudflare)?
 2. **Authentication**: Add user accounts for v2? (Currently public MVP)
 3. **Subtitles/Captions**: Support VTT files in HLS streams?

@@ -14,6 +14,7 @@ Build Next.js 14 app with React 19. Features: video browsing, upload, playback (
 ### 1. Project Structure
 
 Already exists in `apps/web/`. Update to:
+
 ```
 apps/web/
 ├── app/
@@ -72,6 +73,7 @@ bunx shadcn-ui@latest add progress
 ### 4. API Client
 
 **`lib/api.ts`**:
+
 ```typescript
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
 
@@ -108,6 +110,7 @@ export const api = new APIClient()
 Reference detailed plan section 6.2 for full implementation.
 
 **Key features**:
+
 - HLS.js for adaptive streaming
 - Low latency mode for live
 - Auto-track views on play
@@ -153,6 +156,7 @@ export function VideoList({ videos }: { videos: Video[] }) {
 Reference detailed plan section 6.3.
 
 **Flow**:
+
 1. Select file
 2. Get presigned URL from API
 3. Upload directly to MinIO
@@ -164,6 +168,7 @@ Reference detailed plan section 6.3.
 Reference detailed plan section 6.4.
 
 **Features**:
+
 - Request camera/mic permissions
 - Display local preview
 - Mirror video for selfie view
@@ -174,6 +179,7 @@ Reference detailed plan section 6.4.
 Reference detailed plan section 6.4.
 
 **Controls**:
+
 - Start/Stop streaming
 - Toggle video on/off
 - Toggle audio on/off
@@ -183,6 +189,7 @@ Reference detailed plan section 6.4.
 #### 6.1 Home Page
 
 **`app/page.tsx`**:
+
 ```typescript
 export default async function HomePage() {
   const videos = await api.get<Video[]>('/api/videos/list')
@@ -199,6 +206,7 @@ export default async function HomePage() {
 #### 6.2 Video Player Page
 
 **`app/videos/[id]/page.tsx`**:
+
 ```typescript
 export default async function VideoPage({ params }: { params: { id: string } }) {
   const video = await api.get<Video>(`/api/videos/${params.id}`)
@@ -221,6 +229,7 @@ export default async function VideoPage({ params }: { params: { id: string } }) 
 #### 6.3 Upload Page
 
 **`app/videos/upload/page.tsx`**:
+
 ```typescript
 export default function UploadPage() {
   return (
@@ -235,6 +244,7 @@ export default function UploadPage() {
 #### 6.4 Live Streams Page
 
 **`app/live/page.tsx`**:
+
 ```typescript
 export default async function LivePage() {
   // Fetch only live streams
@@ -252,6 +262,7 @@ export default async function LivePage() {
 #### 6.5 Create Live Stream Page
 
 **`app/live/create/page.tsx`**:
+
 ```typescript
 'use client'
 
@@ -285,6 +296,7 @@ export default function CreateLivePage() {
 #### 6.6 Host Streaming Page
 
 **`app/live/stream/[id]/page.tsx`**:
+
 ```typescript
 'use client'
 
@@ -321,6 +333,7 @@ export default function StreamHostPage({ params }: { params: { id: string } }) {
 ### 7. Layout & Navigation
 
 **`app/layout.tsx`**:
+
 ```typescript
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -344,6 +357,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 ### 8. Environment Variables
 
 **`.env.local`**:
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
@@ -351,6 +365,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 ### 9. Testing
 
 Test each page:
+
 ```bash
 bun run dev
 

@@ -1,24 +1,50 @@
 {
-  "name": "with-hono",
+  "name": "streaming-video",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
+    "dev": "turbo dev",
+    "dev:api": "turbo dev --filter=api",
+    "dev:web": "turbo dev --filter=web",
+    "dev:worker": "turbo dev --filter=worker",
+    "build": "turbo build",
+    "build:api": "turbo build --filter=api",
+    "build:web": "turbo build --filter=web",
+    "build:worker": "turbo build --filter=worker",
+    "start": "turbo start",
+    "start:api": "turbo start --filter=api",
+    "start:web": "turbo start --filter=web",
+    "start:worker": "turbo start --filter=worker",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "check-types": "turbo check-types",
+    "test": "turbo test",
+    "clean": "turbo clean && rm -rf node_modules .turbo",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "db:generate": "turbo db:generate",
+    "db:migrate": "turbo db:migrate",
+    "db:migrate:deploy": "turbo db:migrate:deploy",
+    "db:push": "turbo db:push",
+    "db:studio": "turbo db:studio",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:clean": "docker-compose down -v"
   },
   "devDependencies": {
+    "@turbo/gen": "^2.3.3",
     "prettier": "^3.6.2",
     "turbo": "^2.5.5",
     "typescript": "5.8.3"
   },
   "engines": {
-    "node": "22.x"
+    "node": ">=20",
+    "bun": ">=1.1.0"
   },
   "packageManager": "bun@1.2.21",
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "packages/@repo/*"
   ]
 }
