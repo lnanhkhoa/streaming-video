@@ -7,4 +7,92 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Placeholder - will be populated in Phase 2
+model Video {
+  id              String         @id @default(cuid())
+  title           String
+  description     String?
+  thumbnailUrl    String?
+  duration        Int?           // seconds
+  status          VideoStatus    @default(PENDING)
+  visibility      VideoVisibility @default(PUBLIC)
+  videoType       VideoType      @default(VOD)  // VOD or LIVE
+
+  // Original file info (for VOD)
+  originalKey     String?        @unique
+  originalSize    Int?
+  originalFormat  String?
+
+  // Processed variants
+  hlsManifestKey  String?
+
+  // Live streaming info
+  streamKey       String?        @unique  // For RTMP ingest
+  isLiveNow       Boolean        @default(false)
+
+  // Analytics
+  viewsToday      Int            @default(0)
+  viewsMonth      Int            @default(0)
+  viewsTotal      Int            @default(0)
+  lastViewReset   DateTime?      // For resetting daily/monthly counts
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  variants        VideoVariant[]
+  viewLogs        VideoViewLog[]
+
+  @@index([status])
+  @@index([visibility])
+  @@index([videoType])
+  @@index([isLiveNow])
+}
+
+enum VideoStatus {
+  PENDING
+  PROCESSING
+  READY
+  FAILED
+  LIVE
+}
+
+enum VideoVisibility {
+  PUBLIC
+  UNLISTED
+  PRIVATE
+}
+
+enum VideoType {
+  VOD    // Video on Demand
+  LIVE   // Live Stream
+}
+
+model VideoVariant {
+  id          String   @id @default(cuid())
+  videoId     String
+  video       Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  resolution  String   // "1080p", "720p", "480p"
+  bitrate     Int      // kbps
+  codec       String   // "h264"
+  format      String   // "hls"
+
+  storageKey  String   // S3/MinIO key
+  size        Int?     // bytes
+
+  createdAt   DateTime @default(now())
+
+  @@index([videoId])
+}
+
+model VideoViewLog {
+  id        String   @id @default(cuid())
+  videoId   String
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  viewedAt  DateTime @default(now())
+  ipAddress String?  // Optional: for analytics
+  userAgent String?  // Optional: for analytics
+
+  @@index([videoId])
+  @@index([viewedAt])
+}

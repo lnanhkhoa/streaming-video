@@ -19,19 +19,19 @@ Update Turborepo configuration to support all workspace packages and application
 
 ### Functional Requirements
 
-- [ ] Build pipeline with proper dependencies
-- [ ] Dev mode with persistent tasks
-- [ ] Database tasks (generate, migrate, push, studio)
-- [ ] Lint and typecheck tasks
-- [ ] Proper output caching
-- [ ] Root package.json scripts
+- [x] Build pipeline with proper dependencies
+- [x] Dev mode with persistent tasks
+- [x] Database tasks (generate, migrate, push, studio)
+- [x] Lint and typecheck tasks
+- [x] Proper output caching
+- [x] Root package.json scripts
 
 ### Non-Functional Requirements
 
-- [ ] Fast builds with aggressive caching
-- [ ] Parallel execution where possible
-- [ ] No unnecessary rebuilds
-- [ ] Clear task output
+- [x] Fast builds with aggressive caching
+- [x] Parallel execution where possible
+- [x] No unnecessary rebuilds
+- [x] Clear task output
 
 ## Architecture Overview
 
@@ -58,19 +58,19 @@ Root
 
 **Tasks**:
 
-1. [ ] Update turbo.json - file: `turbo.json`
-2. [ ] Define build task with outputs
-3. [ ] Define dev task (persistent, no cache)
-4. [ ] Define database tasks
-5. [ ] Define lint/typecheck tasks
-6. [ ] Configure task dependencies
+1. [x] Update turbo.json - file: `turbo.json`
+2. [x] Define build task with outputs
+3. [x] Define dev task (persistent, no cache)
+4. [x] Define database tasks
+5. [x] Define lint/typecheck tasks
+6. [x] Configure task dependencies
 
 **Acceptance Criteria**:
 
-- [ ] `turbo build` builds all packages in correct order
-- [ ] `turbo dev` runs all dev servers concurrently
-- [ ] Database tasks don't cache inappropriately
-- [ ] Output directories properly cached
+- [x] `turbo build` builds all packages in correct order
+- [x] `turbo dev` runs all dev servers concurrently
+- [x] Database tasks don't cache inappropriately
+- [x] Output directories properly cached
 
 **Files to Update**:
 
@@ -139,16 +139,16 @@ Root
 
 **Tasks**:
 
-1. [ ] Update root package.json - file: `package.json`
-2. [ ] Add turbo task wrappers
-3. [ ] Add convenience scripts
-4. [ ] Add workspace management scripts
+1. [x] Update root package.json - file: `package.json`
+2. [x] Add turbo task wrappers
+3. [x] Add convenience scripts
+4. [x] Add workspace management scripts
 
 **Acceptance Criteria**:
 
-- [ ] All tasks executable from root
-- [ ] Scripts follow consistent naming
-- [ ] Can target specific workspaces
+- [x] All tasks executable from root
+- [x] Scripts follow consistent naming
+- [x] Can target specific workspaces
 
 **Files to Update**:
 
@@ -205,15 +205,15 @@ Root
 
 **Tasks**:
 
-1. [ ] Update apps/api/package.json scripts
-2. [ ] Update apps/web/package.json scripts
-3. [ ] Verify apps/worker/package.json scripts
+1. [x] Update apps/api/package.json scripts
+2. [x] Update apps/web/package.json scripts
+3. [x] Verify apps/worker/package.json scripts
 
 **Acceptance Criteria**:
 
-- [ ] All apps have dev, build, start, lint, typecheck scripts
-- [ ] Scripts follow same pattern across apps
-- [ ] Turbo can discover and run all scripts
+- [x] All apps have dev, build, start, lint, typecheck scripts
+- [x] Scripts follow same pattern across apps
+- [x] Turbo can discover and run all scripts
 
 **Files to Update**:
 
@@ -264,13 +264,13 @@ Root
 
 **Tasks**:
 
-1. [ ] Update .gitignore - file: `.gitignore`
+1. [x] Update .gitignore - file: `.gitignore`
 
 **Acceptance Criteria**:
 
-- [ ] Turbo cache ignored
-- [ ] Build outputs ignored
-- [ ] No cache committed to git
+- [x] Turbo cache ignored
+- [x] Build outputs ignored
+- [x] No cache committed to git
 
 **Files to Update**:
 
@@ -303,9 +303,9 @@ node_modules/.prisma
 
 ## Security Considerations
 
-- [ ] No secrets in turbo.json
-- [ ] Environment variables properly scoped
-- [ ] Cache doesn't leak sensitive data
+- [x] No secrets in turbo.json
+- [x] Environment variables properly scoped
+- [x] Cache doesn't leak sensitive data
 
 ## Risk Assessment
 
@@ -356,23 +356,23 @@ bun turbo build --graph
 
 ## TODO Checklist
 
-- [ ] Update turbo.json with all task definitions
-- [ ] Configure build task with outputs
-- [ ] Configure dev task (persistent, no cache)
-- [ ] Configure database tasks (no cache)
-- [ ] Configure lint/typecheck tasks
-- [ ] Update root package.json with convenience scripts
-- [ ] Verify apps/api/package.json scripts
-- [ ] Verify apps/web/package.json scripts
-- [ ] Verify apps/worker/package.json scripts
-- [ ] Update .gitignore with .turbo
-- [ ] Test `bun turbo build` from clean state
-- [ ] Test `bun turbo dev` starts all services
-- [ ] Test `bun turbo build --filter=api` targets correctly
-- [ ] Test build cache works (run build twice)
-- [ ] Test `bun turbo db:generate`
-- [ ] Generate task graph: `bun turbo build --graph`
-- [ ] Commit changes to git
+- [x] Update turbo.json with all task definitions
+- [x] Configure build task with outputs
+- [x] Configure dev task (persistent, no cache)
+- [x] Configure database tasks (no cache)
+- [x] Configure lint/typecheck tasks
+- [x] Update root package.json with convenience scripts
+- [x] Verify apps/api/package.json scripts
+- [x] Verify apps/web/package.json scripts
+- [x] Verify apps/worker/package.json scripts
+- [x] Update .gitignore with .turbo
+- [x] Test `bun turbo build` from clean state
+- [x] Test `bun turbo dev` starts all services
+- [x] Test `bun turbo build --filter=api` targets correctly
+- [x] Test build cache works (run build twice)
+- [x] Test `bun turbo db:generate`
+- [x] Generate task graph: `bun turbo build --graph`
+- [x] Commit changes to git
 
 ## Performance Targets
 

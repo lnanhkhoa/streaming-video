@@ -11,7 +11,6 @@
       "Bash(mkdir:*)",
       "Bash(node:*)",
       "Bash(curl:*)",
-      "Bash(bun:*)",
       "Bash(bun run:*)",
       "Bash(bun add:*)",
       "Bash(bun dev)",

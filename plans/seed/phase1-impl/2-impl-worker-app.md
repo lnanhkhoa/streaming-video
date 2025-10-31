@@ -19,18 +19,18 @@ Establish worker application structure with proper TypeScript configuration, bui
 
 ### Functional Requirements
 
-- [ ] Worker app with TypeScript support
-- [ ] Proper build configuration (tsup)
-- [ ] Dev mode with hot reload (tsx watch)
-- [ ] Workspace dependency references
-- [ ] Placeholder entry point
+- [x] Worker app with TypeScript support
+- [x] Proper build configuration (tsup)
+- [x] Dev mode with hot reload (tsx watch)
+- [x] Workspace dependency references
+- [x] Placeholder entry point
 
 ### Non-Functional Requirements
 
-- [ ] Fast builds with Turbo caching
-- [ ] Zero runtime errors on startup
-- [ ] Proper TypeScript strict mode
-- [ ] Clean console output
+- [x] Fast builds with Turbo caching
+- [x] Zero runtime errors on startup
+- [x] Proper TypeScript strict mode
+- [x] Clean console output
 
 ## Architecture Overview
 
@@ -63,17 +63,17 @@ apps/worker/
 
 **Tasks**:
 
-1. [ ] Create app directory - folder: `apps/worker/`
-2. [ ] Create src directory - folder: `apps/worker/src/`
-3. [ ] Create package.json - file: `apps/worker/package.json`
-4. [ ] Create tsconfig.json - file: `apps/worker/tsconfig.json`
-5. [ ] Create tsup.config.ts - file: `apps/worker/tsup.config.ts`
+1. [x] Create app directory - folder: `apps/worker/`
+2. [x] Create src directory - folder: `apps/worker/src/`
+3. [x] Create package.json - file: `apps/worker/package.json`
+4. [x] Create tsconfig.json - file: `apps/worker/tsconfig.json`
+5. [x] Create tsup.config.ts - file: `apps/worker/tsup.config.ts`
 
 **Acceptance Criteria**:
 
-- [ ] Directory structure matches plan
-- [ ] Can run `bun install` without errors
-- [ ] TypeScript configuration extends from @repo/typescript-config
+- [x] Directory structure matches plan
+- [x] Can run `bun install` without errors
+- [x] TypeScript configuration extends from @repo/typescript-config
 
 **Files to Create**:
 
@@ -154,17 +154,17 @@ export default defineConfig({
 
 **Tasks**:
 
-1. [ ] Create index.ts - file: `apps/worker/src/index.ts`
-2. [ ] Add startup logging
-3. [ ] Test database connection
-4. [ ] Add graceful shutdown
+1. [x] Create index.ts - file: `apps/worker/src/index.ts`
+2. [x] Add startup logging
+3. [x] Test database connection
+4. [x] Add graceful shutdown
 
 **Acceptance Criteria**:
 
-- [ ] Worker starts without errors
-- [ ] Logs "Worker ready" message
-- [ ] Can import @repo packages
-- [ ] Process exits cleanly on SIGINT
+- [x] Worker starts without errors
+- [x] Logs "Worker ready" message
+- [x] Can import @repo packages
+- [x] Process exits cleanly on SIGINT
 
 **Files to Create**:
 
@@ -219,17 +219,17 @@ main().catch(async (error) => {
 
 **Tasks**:
 
-1. [ ] Create consumer.ts placeholder - file: `apps/worker/src/consumer.ts`
-2. [ ] Create transcoder.ts placeholder - file: `apps/worker/src/transcoder.ts`
-3. [ ] Create live-stream.ts placeholder - file: `apps/worker/src/live-stream.ts`
-4. [ ] Create services/storage.ts placeholder - file: `apps/worker/src/services/storage.ts`
-5. [ ] Create types.ts - file: `apps/worker/src/types.ts`
+1. [x] Create consumer.ts placeholder - file: `apps/worker/src/consumer.ts`
+2. [x] Create transcoder.ts placeholder - file: `apps/worker/src/transcoder.ts`
+3. [x] Create live-stream.ts placeholder - file: `apps/worker/src/live-stream.ts`
+4. [x] Create services/storage.ts placeholder - file: `apps/worker/src/services/storage.ts`
+5. [x] Create types.ts - file: `apps/worker/src/types.ts`
 
 **Acceptance Criteria**:
 
-- [ ] All files created with TODO comments
-- [ ] No compilation errors
-- [ ] Imports resolve correctly
+- [x] All files created with TODO comments
+- [x] No compilation errors
+- [x] Imports resolve correctly
 
 **Files to Create**:
 
@@ -378,12 +378,12 @@ export interface LiveStreamConfig {
 
 **Tasks**:
 
-1. [ ] Update .env.example - file: `.env.example`
+1. [x] Update .env.example - file: `.env.example`
 
 **Acceptance Criteria**:
 
-- [ ] All worker env vars documented
-- [ ] Defaults provided for development
+- [x] All worker env vars documented
+- [x] Defaults provided for development
 
 **Update `.env.example`**:
 
@@ -403,9 +403,9 @@ FFMPEG_CRF=23
 
 ## Security Considerations
 
-- [ ] No hardcoded credentials in source
-- [ ] Environment variables for all secrets
-- [ ] Database connection uses Prisma client singleton
+- [x] No hardcoded credentials in source
+- [x] Environment variables for all secrets
+- [x] Database connection uses Prisma client singleton
 
 ## Risk Assessment
 
@@ -443,18 +443,18 @@ bun run typecheck
 
 ## TODO Checklist
 
-- [ ] Create apps/worker directory structure
-- [ ] Create package.json with all dependencies
-- [ ] Create tsconfig.json extending @repo/typescript-config
-- [ ] Create tsup.config.ts for build
-- [ ] Create src/index.ts with startup logic
-- [ ] Create placeholder files (consumer, transcoder, live-stream, storage)
-- [ ] Run `bun install` in worker directory
-- [ ] Test `bun run dev` starts successfully
-- [ ] Test `bun run build` completes without errors
-- [ ] Verify worker logs "Worker ready" message
-- [ ] Test SIGINT graceful shutdown
-- [ ] Commit changes to git
+- [x] Create apps/worker directory structure
+- [x] Create package.json with all dependencies
+- [x] Create tsconfig.json extending @repo/typescript-config
+- [x] Create tsup.config.ts for build
+- [x] Create src/index.ts with startup logic
+- [x] Create placeholder files (consumer, transcoder, live-stream, storage)
+- [x] Run `bun install` in worker directory
+- [x] Test `bun run dev` starts successfully
+- [x] Test `bun run build` completes without errors
+- [x] Verify worker logs "Worker ready" message
+- [x] Test SIGINT graceful shutdown
+- [x] Commit changes to git
 
 ## Notes
 

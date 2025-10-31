@@ -19,16 +19,16 @@ Establish foundational workspace packages (@repo/database, @repo/utils, @repo/co
 
 ### Functional Requirements
 
-- [ ] Database package with Prisma client export
-- [ ] Utils package with formatting helpers
-- [ ] Constants package for app-wide values AND shared TypeScript types
-- [ ] All packages properly configured in workspace
+- [x] Database package with Prisma client export
+- [x] Utils package with formatting helpers
+- [x] Constants package for app-wide values AND shared TypeScript types
+- [x] All packages properly configured in workspace
 
 ### Non-Functional Requirements
 
-- [ ] Zero external dependencies in utils/constants
-- [ ] Fast builds with Turbo caching
-- [ ] Type-safe imports across all apps
+- [x] Zero external dependencies in utils/constants
+- [x] Fast builds with Turbo caching
+- [x] Type-safe imports across all apps
 
 ## Architecture Overview
 
@@ -69,16 +69,16 @@ packages/
 
 **Tasks**:
 
-1. [ ] Create package structure - file: `packages/database/package.json`
-2. [ ] Create Prisma placeholder schema - file: `packages/database/prisma/schema.prisma`
-3. [ ] Create client export - file: `packages/database/index.ts`
-4. [ ] Add package scripts (db:generate, db:migrate, db:push, db:studio)
+1. [x] Create package structure - file: `packages/database/package.json`
+2. [x] Create Prisma placeholder schema - file: `packages/database/prisma/schema.prisma`
+3. [x] Create client export - file: `packages/database/index.ts`
+4. [x] Add package scripts (db:generate, db:migrate, db:push, db:studio)
 
 **Acceptance Criteria**:
 
-- [ ] Package builds without errors
-- [ ] Can import from `@repo/database` in other packages
-- [ ] Prisma scripts execute successfully
+- [x] Package builds without errors
+- [x] Can import from `@repo/database` in other packages
+- [x] Prisma scripts execute successfully
 
 **Files to Create**:
 
@@ -149,18 +149,18 @@ datasource db {
 
 **Tasks**:
 
-1. [ ] Create package structure - file: `packages/utils/package.json`
-2. [ ] Implement file size formatter - file: `packages/utils/index.ts`
-3. [ ] Implement duration formatter
-4. [ ] Implement date helpers
-5. [ ] Add unit tests (optional)
+1. [x] Create package structure - file: `packages/utils/package.json`
+2. [x] Implement file size formatter - file: `packages/utils/index.ts`
+3. [x] Implement duration formatter
+4. [x] Implement date helpers
+5. [x] Add unit tests (optional)
 
 **Acceptance Criteria**:
 
-- [ ] formatFileSize returns correct units
-- [ ] formatDuration handles hours/minutes/seconds
-- [ ] All functions have JSDoc comments
-- [ ] Can import utils in all apps
+- [x] formatFileSize returns correct units
+- [x] formatDuration handles hours/minutes/seconds
+- [x] All functions have JSDoc comments
+- [x] Can import utils in all apps
 
 **Files to Create**:
 
@@ -258,24 +258,24 @@ export function sleep(ms: number): Promise<void> {
 
 **Tasks**:
 
-1. [ ] Update package structure - file: `packages/constants/package.json`
-2. [ ] Define video constants - file: `packages/constants/src/constants.ts`
-3. [ ] Define HLS variant configurations
-4. [ ] Define file upload limits
-5. [ ] Create types file - file: `packages/constants/src/types.ts`
-6. [ ] Define shared TypeScript types (VideoStatus, VideoType, VideoVisibility)
-7. [ ] Define Video interfaces (Video, VideoVariant, VideoViewLog)
-8. [ ] Define API request/response types
-9. [ ] Create index.ts to export everything - file: `packages/constants/src/index.ts`
+1. [x] Update package structure - file: `packages/constants/package.json`
+2. [x] Define video constants - file: `packages/constants/src/constants.ts`
+3. [x] Define HLS variant configurations
+4. [x] Define file upload limits
+5. [x] Create types file - file: `packages/constants/src/types.ts`
+6. [x] Define shared TypeScript types (VideoStatus, VideoType, VideoVisibility)
+7. [x] Define Video interfaces (Video, VideoVariant, VideoViewLog)
+8. [x] Define API request/response types
+9. [x] Create index.ts to export everything - file: `packages/constants/src/index.ts`
 
 **Acceptance Criteria**:
 
-- [ ] All constants exported with types
-- [ ] All enum types defined
-- [ ] Video interface matches database schema
-- [ ] Can import constants and types in all apps
-- [ ] Constants match detailed plan specifications
-- [ ] No compilation errors
+- [x] All constants exported with types
+- [x] All enum types defined
+- [x] Video interface matches database schema
+- [x] Can import constants and types in all apps
+- [x] Constants match detailed plan specifications
+- [x] No compilation errors
 
 **Files to Create/Update**:
 
@@ -431,9 +431,9 @@ export * from './constants'
 
 ## Security Considerations
 
-- [ ] No secrets or credentials in constants
-- [ ] Database client uses connection pooling
-- [ ] Prisma client singleton prevents connection leaks
+- [x] No secrets or credentials in constants
+- [x] Database client uses connection pooling
+- [x] Prisma client singleton prevents connection leaks
 
 ## Risk Assessment
 
@@ -471,12 +471,12 @@ bun run dev
 
 ## TODO Checklist
 
-- [ ] Create @repo/database package structure
-- [ ] Create @repo/utils package structure
-- [ ] Update @repo/constants package structure (merge types into constants)
-- [ ] Install dependencies with `bun install`
-- [ ] Verify packages resolve in apps/api
-- [ ] Verify packages resolve in apps/web
-- [ ] Run `bun turbo build`
-- [ ] Update root package.json with workspace references
-- [ ] Commit changes to git
+- [x] Create @repo/database package structure
+- [x] Create @repo/utils package structure
+- [x] Update @repo/constants package structure (merge types into constants)
+- [x] Install dependencies with `bun install`
+- [x] Verify packages resolve in apps/api
+- [x] Verify packages resolve in apps/web
+- [x] Run `bun turbo build`
+- [x] Update root package.json with workspace references
+- [x] Commit changes to git
