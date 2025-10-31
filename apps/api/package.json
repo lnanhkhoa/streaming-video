@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "hono": "^4.8.10",
-    "@repo/constants": "workspace:*"
+    "@repo/constants": "*"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
