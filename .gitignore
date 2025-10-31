@@ -44,6 +44,7 @@ repomix-output.xml
 .serena/cache
 
 # Claude + Plans
+.env
 screenshots/*
 docs/*
 docs/screenshots/*
@@ -56,3 +57,4 @@ plans/templates/*
 .claude/hooks/*
 .claude/skills/*
 .claude/workflows/*
+.mcp.json
