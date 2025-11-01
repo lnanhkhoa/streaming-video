@@ -1,6 +1,6 @@
 import { prisma } from '@repo/database'
 import { cacheService } from './cache.service'
-import { NotFoundError } from '../utils/errors.js'
+import { NotFoundError } from '../utils/errors'
 
 interface VideoStats {
   viewsToday: number

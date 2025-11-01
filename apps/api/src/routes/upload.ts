@@ -1,12 +1,12 @@
 import { Hono } from 'hono'
 import { nanoid } from 'nanoid'
 import { prisma } from '@repo/database'
-import { storageService } from '../services/storage.service.js'
-import { queueService } from '../services/queue.service.js'
-import { successResponse } from '../utils/response.js'
-import { presignUploadSchema, completeUploadSchema } from '../utils/validator.js'
-import { zValidator } from '../middlewares/validation.js'
-import { NotFoundError } from '../utils/errors.js'
+import { storageService } from '../services/storage.service'
+import { queueService } from '../services/queue.service'
+import { successResponse } from '../utils/response'
+import { presignUploadSchema, completeUploadSchema } from '../utils/validator'
+import { zValidator } from '../middlewares/validation'
+import { NotFoundError } from '../utils/errors'
 
 const uploadRoutes = new Hono()
 
@@ -31,7 +31,7 @@ uploadRoutes.post('/presign', zValidator('json', presignUploadSchema), async (c)
       videoId,
       uploadUrl,
       key,
-      expiresIn: 3600,
+      expiresIn: 3600
     },
     201
   )
@@ -64,14 +64,14 @@ uploadRoutes.post('/:id/complete', zValidator('json', completeUploadSchema), asy
       isLiveNow: false,
       viewsToday: 0,
       viewsMonth: 0,
-      viewsTotal: 0,
-    },
+      viewsTotal: 0
+    }
   })
 
   // Publish transcode job to queue
   const jobPublished = await queueService.publishTranscodeJob({
     videoId,
-    originalKey: key,
+    inputKey: key
   })
 
   if (!jobPublished) {

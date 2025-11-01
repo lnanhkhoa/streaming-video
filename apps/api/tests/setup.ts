@@ -14,7 +14,9 @@ async function cleanDatabase() {
   const variants = await prisma.videoVariant.deleteMany()
   const videos = await prisma.video.deleteMany()
 
-  console.log(`🧹 DB Cleanup: ${videos.count} videos, ${variants.count} variants, ${viewLogs.count} logs deleted`)
+  console.log(
+    `🧹 DB Cleanup: ${videos.count} videos, ${variants.count} variants, ${viewLogs.count} logs deleted`
+  )
   return { videos: videos.count, variants: variants.count, viewLogs: viewLogs.count }
 }
 

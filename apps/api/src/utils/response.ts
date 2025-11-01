@@ -1,5 +1,5 @@
 import type { Context } from 'hono'
-import type { SuccessResponse } from '../types/index.js'
+import type { SuccessResponse } from '../types/index'
 import type { ContentfulStatusCode } from 'hono/utils/http-status'
 
 /**

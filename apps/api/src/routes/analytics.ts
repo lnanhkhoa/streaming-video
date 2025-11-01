@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
-import { analyticsService } from '../services/analytics.service.js'
-import { successResponse } from '../utils/response.js'
-import { NotFoundError } from '../utils/errors.js'
+import { analyticsService } from '../services/analytics.service'
+import { successResponse } from '../utils/response'
+import { NotFoundError } from '../utils/errors'
 
 const analyticsRoutes = new Hono()
 

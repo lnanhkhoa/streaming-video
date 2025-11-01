@@ -1,11 +1,11 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
-import { errorHandler } from './middlewares/error.js'
-import { videoRoutes } from './routes/videos.js'
-import { uploadRoutes } from './routes/upload.js'
-import { analyticsRoutes } from './routes/analytics.js'
-import { liveRoutes } from './routes/live.js'
+import { errorHandler } from './middlewares/error'
+import { videoRoutes } from './routes/videos'
+import { uploadRoutes } from './routes/upload'
+import { analyticsRoutes } from './routes/analytics'
+import { liveRoutes } from './routes/live'
 
 const app = new Hono()
 
@@ -16,13 +16,15 @@ app.use('*', cors())
 // Health check
 app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }))
 
-// Routes
-app.route('/api/videos', videoRoutes)
-app.route('/api/upload', uploadRoutes)
-app.route('/api/analytics', analyticsRoutes)
-app.route('/api/live', liveRoutes)
+// Routes - properly typed for RPC
+const routes = app
+  .route('/api/videos', videoRoutes)
+  .route('/api/upload', uploadRoutes)
+  .route('/api/analytics', analyticsRoutes)
+  .route('/api/live', liveRoutes)
 
 // Global error handler (must be last)
-app.onError(errorHandler)
+routes.onError(errorHandler)
 
-export { app }
+export { routes as app }
+export type AppType = typeof routes

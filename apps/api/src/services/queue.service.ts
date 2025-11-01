@@ -1,11 +1,20 @@
 import * as amqp from 'amqplib'
-import { type TranscodeJob, validateTranscodeJob } from '../types/queue'
+import {
+  type TranscodeJob,
+  type StartLiveStreamJob,
+  type StopLiveStreamJob,
+  type WorkerJob,
+  validateTranscodeJob,
+  validateStartLiveStreamJob,
+  validateStopLiveStreamJob,
+  validateWorkerJob
+} from '../types/queue'
 import { env } from '../env'
 
 class QueueService {
   private connection: Awaited<ReturnType<typeof amqp.connect>> | null = null
   private channel: amqp.Channel | null = null
-  private readonly queueName = 'transcode-queue'
+  private readonly queueName = 'video-transcode' // Match worker queue name
   private isConnected = false
   private reconnectTimeout: NodeJS.Timeout | null = null
 
@@ -78,19 +87,11 @@ class QueueService {
   }
 
   /**
-   * Publish transcode job to queue
-   * @param job - Transcode job payload
+   * Generic method to publish any job to queue
+   * @param job - Worker job payload
    * @returns Success boolean
    */
-  async publishTranscodeJob(job: TranscodeJob): Promise<boolean> {
-    // Validate before publishing
-    try {
-      validateTranscodeJob(job)
-    } catch (error) {
-      console.error('Invalid transcode job:', error)
-      return false
-    }
-
+  private async publishJob(job: WorkerJob): Promise<boolean> {
     if (!this.isConnected || !this.channel) {
       console.error('Cannot publish: RabbitMQ not connected')
       return false
@@ -104,17 +105,67 @@ class QueueService {
         contentType: 'application/json'
       })
 
+      const jobType = (job as any).type || 'transcode'
       if (sent) {
-        console.log(`✅ Published transcode job: ${job.videoId}`)
+        console.log(`✅ Published ${jobType} job: ${job.videoId}`)
         return true
       } else {
-        console.warn('⚠️ Queue buffer full, message not sent')
+        console.warn(`⚠️ Queue buffer full, ${jobType} job not sent`)
         return false
       }
     } catch (error) {
-      console.error('Failed to publish transcode job:', error)
+      console.error('Failed to publish job:', error)
       return false
     }
+  }
+
+  /**
+   * Publish transcode job to queue
+   * @param job - Transcode job payload
+   * @returns Success boolean
+   */
+  async publishTranscodeJob(job: TranscodeJob): Promise<boolean> {
+    // Validate before publishing
+    try {
+      validateTranscodeJob(job)
+    } catch (error) {
+      console.error('Invalid transcode job:', error)
+      return false
+    }
+
+    return this.publishJob(job)
+  }
+
+  /**
+   * Publish start live stream job to queue
+   * @param job - Start live stream job payload
+   * @returns Success boolean
+   */
+  async publishStartLiveStreamJob(job: StartLiveStreamJob): Promise<boolean> {
+    try {
+      validateStartLiveStreamJob(job)
+    } catch (error) {
+      console.error('Invalid start live stream job:', error)
+      return false
+    }
+
+    return this.publishJob(job)
+  }
+
+  /**
+   * Publish stop live stream job to queue
+   * @param job - Stop live stream job payload
+   * @returns Success boolean
+   */
+  async publishStopLiveStreamJob(job: StopLiveStreamJob): Promise<boolean> {
+    try {
+      validateStopLiveStreamJob(job)
+    } catch (error) {
+      console.error('Invalid stop live stream job:', error)
+      return false
+    }
+
+    return this.publishJob(job)
   }
 
   /**

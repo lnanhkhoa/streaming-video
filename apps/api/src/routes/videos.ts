@@ -1,9 +1,9 @@
 import { Hono } from 'hono'
-import { videoService } from '../services/video.service.js'
-import { successResponse } from '../utils/response.js'
-import { updateVideoSchema } from '../utils/validator.js'
-import { zValidator } from '../middlewares/validation.js'
-import { NotFoundError } from '../utils/errors.js'
+import { videoService } from '../services/video.service'
+import { successResponse } from '../utils/response'
+import { updateVideoSchema } from '../utils/validator'
+import { zValidator } from '../middlewares/validation'
+import { NotFoundError } from '../utils/errors'
 
 const videoRoutes = new Hono()
 

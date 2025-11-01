@@ -2,7 +2,7 @@ import { prisma } from '@repo/database'
 import type { Video, VideoVariant, VideoVisibility } from '@repo/constants'
 import { cacheService } from './cache.service'
 import { storageService } from './storage.service'
-import { NotFoundError } from '../utils/errors.js'
+import { NotFoundError } from '../utils/errors'
 
 interface ListVideosOptions {
   limit?: number

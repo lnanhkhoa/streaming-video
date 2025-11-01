@@ -70,8 +70,8 @@ export function handlePrismaError(err: unknown, c: Context): Response {
             error: {
               message: 'Resource already exists',
               status: 409,
-              code: 'CONFLICT',
-            },
+              code: 'CONFLICT'
+            }
           },
           409
         )
@@ -83,8 +83,8 @@ export function handlePrismaError(err: unknown, c: Context): Response {
             error: {
               message: 'Resource not found',
               status: 404,
-              code: 'NOT_FOUND',
-            },
+              code: 'NOT_FOUND'
+            }
           },
           404
         )
@@ -96,8 +96,8 @@ export function handlePrismaError(err: unknown, c: Context): Response {
             error: {
               message: 'Related resource not found',
               status: 400,
-              code: 'FOREIGN_KEY_CONSTRAINT',
-            },
+              code: 'FOREIGN_KEY_CONSTRAINT'
+            }
           },
           400
         )
@@ -110,8 +110,8 @@ export function handlePrismaError(err: unknown, c: Context): Response {
             error: {
               message: 'Database error',
               status: 500,
-              code: 'DATABASE_ERROR',
-            },
+              code: 'DATABASE_ERROR'
+            }
           },
           500
         )
