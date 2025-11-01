@@ -12,6 +12,7 @@ model Video {
   title           String
   description     String?
   thumbnailUrl    String?
+  thumbnailKey    String?        // MinIO storage key for thumbnail
   duration        Int?           // seconds
   status          VideoStatus    @default(PENDING)
   visibility      VideoVisibility @default(PUBLIC)
@@ -72,11 +73,14 @@ model VideoVariant {
   video       Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
   resolution  String   // "1080p", "720p", "480p"
+  width       Int      // pixels
+  height      Int      // pixels
   bitrate     Int      // kbps
   codec       String   // "h264"
   format      String   // "hls"
 
-  storageKey  String   // S3/MinIO key
+  storageKey  String   // S3/MinIO base key
+  playlistKey String   // HLS playlist path (variant.m3u8)
   size        Int?     // bytes
 
   createdAt   DateTime @default(now())

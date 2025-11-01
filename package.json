@@ -33,12 +33,14 @@
   },
   "devDependencies": {
     "@turbo/gen": "^2.3.3",
+    "@types/node": "latest",
     "prettier": "^3.6.2",
+    "@types/bun": "latest",
     "turbo": "^2.5.5",
-    "typescript": "5.8.3"
+    "typescript": "5.9.3"
   },
   "engines": {
-    "node": ">=20",
+    "node": ">=22",
     "bun": ">=1.1.0"
   },
   "packageManager": "bun@1.2.21",
