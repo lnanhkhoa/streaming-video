@@ -5,8 +5,9 @@ import { successResponse } from '../utils/response'
 import { createLiveStreamSchema } from '../utils/validator'
 import { zValidator } from '../middlewares/validation'
 import { BadRequestError } from '../utils/errors'
+import { Bindings } from 'hono/types'
 
-const liveRoutes = new Hono()
+const app = new Hono<{ Bindings: Bindings }>()
 
 // Validation schemas for live stream operations
 const startStreamSchema = z.object({
@@ -26,7 +27,7 @@ const visibilitySchema = z.object({
  * POST /api/live/create
  * Create new live stream session
  */
-liveRoutes.post('/create', zValidator('json', createLiveStreamSchema), async (c) => {
+app.post('/create', zValidator('json', createLiveStreamSchema), async (c) => {
   const { title, description } = c.req.valid('json')
 
   const result = await liveService.createStream(title, description)
@@ -39,7 +40,7 @@ liveRoutes.post('/create', zValidator('json', createLiveStreamSchema), async (c)
  * nginx-rtmp authentication callback
  * Returns 200 if streamKey valid, 403 otherwise
  */
-liveRoutes.post('/verify', async (c) => {
+app.post('/verify', async (c) => {
   try {
     // nginx-rtmp sends streamKey as 'name' in form data
     const body = await c.req.parseBody()
@@ -69,7 +70,7 @@ liveRoutes.post('/verify', async (c) => {
  * POST /api/live/unpublish
  * nginx-rtmp unpublish callback (stream stopped)
  */
-liveRoutes.post('/unpublish', async (c) => {
+app.post('/unpublish', async (c) => {
   try {
     const body = await c.req.parseBody()
     const streamKey = body.name as string
@@ -91,7 +92,7 @@ liveRoutes.post('/unpublish', async (c) => {
  * POST /api/live/:id/start
  * Start live streaming
  */
-liveRoutes.post('/:id/start', zValidator('json', startStreamSchema), async (c) => {
+app.post('/:id/start', zValidator('json', startStreamSchema), async (c) => {
   const videoId = c.req.param('id')
   const { streamKey, inputSource } = c.req.valid('json')
 
@@ -108,7 +109,7 @@ liveRoutes.post('/:id/start', zValidator('json', startStreamSchema), async (c) =
  * POST /api/live/:id/stop
  * Stop live streaming
  */
-liveRoutes.post('/:id/stop', zValidator('json', stopStreamSchema), async (c) => {
+app.post('/:id/stop', zValidator('json', stopStreamSchema), async (c) => {
   const videoId = c.req.param('id')
   const { convertToVOD } = c.req.valid('json')
 
@@ -124,7 +125,7 @@ liveRoutes.post('/:id/stop', zValidator('json', stopStreamSchema), async (c) => 
  * GET /api/live/active
  * Get all active live streams
  */
-liveRoutes.get('/active', async (c) => {
+app.get('/active', async (c) => {
   const streams = await liveService.getActiveStreams()
 
   return successResponse(c, { streams, count: streams.length })
@@ -134,7 +135,7 @@ liveRoutes.get('/active', async (c) => {
  * GET /api/live/:id
  * Get stream details
  */
-liveRoutes.get('/:id', async (c) => {
+app.get('/:id', async (c) => {
   const videoId = c.req.param('id')
   const stream = await liveService.getStream(videoId)
 
@@ -145,7 +146,7 @@ liveRoutes.get('/:id', async (c) => {
  * PATCH /api/live/:id/visibility
  * Update stream visibility
  */
-liveRoutes.patch('/:id/visibility', zValidator('json', visibilitySchema), async (c) => {
+app.patch('/:id/visibility', zValidator('json', visibilitySchema), async (c) => {
   const videoId = c.req.param('id')
   const { visibility } = c.req.valid('json')
 
@@ -161,7 +162,7 @@ liveRoutes.patch('/:id/visibility', zValidator('json', visibilitySchema), async 
  * GET /api/live/:id/watch
  * Get HLS playback URL
  */
-liveRoutes.get('/:id/watch', async (c) => {
+app.get('/:id/watch', async (c) => {
   const videoId = c.req.param('id')
   const stream = await liveService.getStream(videoId)
 
@@ -181,4 +182,4 @@ liveRoutes.get('/:id/watch', async (c) => {
   })
 })
 
-export { liveRoutes }
+export default app

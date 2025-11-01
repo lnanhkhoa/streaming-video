@@ -4,9 +4,9 @@ import { prisma } from '@repo/database'
 import { client } from '../helpers/client'
 
 describe('Videos Routes', () => {
-  describe('GET /api/videos/list', () => {
+  describe('GET /api/videos', () => {
     it('should return empty list initially', async () => {
-      const res = await client.get('/api/videos/list')
+      const res = await client.get('/api/videos')
 
       expect(res.status).toBe(200)
       expect(res.body.success).toBe(true)
@@ -43,7 +43,7 @@ describe('Videos Routes', () => {
         ]
       })
 
-      const res = await client.get('/api/videos/list?limit=1')
+      const res = await client.get('/api/videos?limit=1')
 
       expect(res.status).toBe(200)
       expect(res.body.data.videos).toHaveLength(1)
@@ -78,7 +78,7 @@ describe('Videos Routes', () => {
         ]
       })
 
-      const res = await client.get('/api/videos/list?status=READY')
+      const res = await client.get('/api/videos?status=READY')
 
       expect(res.status).toBe(200)
       expect(res.body.data.videos).toHaveLength(1)

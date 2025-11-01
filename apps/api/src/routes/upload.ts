@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { Bindings } from 'hono/types'
 import { nanoid } from 'nanoid'
 import { prisma } from '@repo/database'
 import { storageService } from '../services/storage.service'
@@ -8,13 +9,13 @@ import { presignUploadSchema, completeUploadSchema } from '../utils/validator'
 import { zValidator } from '../middlewares/validation'
 import { NotFoundError } from '../utils/errors'
 
-const uploadRoutes = new Hono()
+const app = new Hono<{ Bindings: Bindings }>()
 
 /**
  * POST /api/upload/presign
  * Generate presigned upload URL for client-side upload
  */
-uploadRoutes.post('/presign', zValidator('json', presignUploadSchema), async (c) => {
+app.post('/presign', zValidator('json', presignUploadSchema), async (c) => {
   const { fileName, fileSize, contentType } = c.req.valid('json')
 
   // Generate video ID and object key
@@ -41,7 +42,7 @@ uploadRoutes.post('/presign', zValidator('json', presignUploadSchema), async (c)
  * POST /api/upload/:id/complete
  * Mark upload as complete, create video record, trigger transcoding
  */
-uploadRoutes.post('/:id/complete', zValidator('json', completeUploadSchema), async (c) => {
+app.post('/:id/complete', zValidator('json', completeUploadSchema), async (c) => {
   const videoId = c.req.param('id')
   const { key, title, description } = c.req.valid('json')
 
@@ -82,4 +83,4 @@ uploadRoutes.post('/:id/complete', zValidator('json', completeUploadSchema), asy
   return successResponse(c, { video }, 201)
 })
 
-export { uploadRoutes }
+export default app

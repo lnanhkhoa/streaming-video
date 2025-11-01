@@ -27,10 +27,7 @@ export const zValidator = <T extends ZodSchema, Target extends keyof ValidationT
     if (!result.success) {
       // Throw HTTPException with the Zod error as cause
       // This will be caught by the global error handler
-      throw new HTTPException(400, {
-        message: 'Validation failed',
-        cause: result.error
-      })
+      throw new HTTPException(400, { message: 'Validation failed', cause: result.error })
     }
   })
 }

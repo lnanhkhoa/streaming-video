@@ -1,4 +1,4 @@
-import type { Context, ErrorHandler } from 'hono'
+import type { ErrorHandler } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { ZodError } from 'zod'
 import { handlePrismaError } from '../utils/errors'

@@ -1,8 +1,7 @@
 import { serve } from '@hono/node-server'
-import { app } from './app'
+import app from './app'
 import { env } from './env'
 import { initializeScheduler } from './utils/scheduler'
-import { queueService } from './services/queue.service'
 
 const port = env.PORT
 
@@ -38,10 +37,7 @@ async function startServer() {
     console.log('\n✅ All services ready\n')
 
     // Start HTTP server
-    serve({
-      fetch: app.fetch,
-      port
-    })
+    serve({ fetch: app.fetch, port })
 
     console.log(`🚀 API server listening on http://localhost:${port}`)
     console.log(`📊 Health check: http://localhost:${port}/health\n`)

@@ -1,17 +1,19 @@
 import { Hono } from 'hono'
+import { Bindings } from 'hono/types'
+
 import { videoService } from '../services/video.service'
 import { successResponse } from '../utils/response'
 import { updateVideoSchema } from '../utils/validator'
 import { zValidator } from '../middlewares/validation'
 import { NotFoundError } from '../utils/errors'
 
-const videoRoutes = new Hono()
+const app = new Hono<{ Bindings: Bindings }>()
 
 /**
- * GET /api/videos/list
+ * GET /api/videos
  * List videos with pagination and filters
  */
-videoRoutes.get('/list', async (c) => {
+app.get('/', async (c) => {
   const limit = Number(c.req.query('limit')) || 20
   const offset = Number(c.req.query('offset')) || 0
   const status = c.req.query('status')
@@ -33,7 +35,7 @@ videoRoutes.get('/list', async (c) => {
  * GET /api/videos/:id
  * Get video details with variants and playback URLs
  */
-videoRoutes.get('/:id', async (c) => {
+app.get('/:id', async (c) => {
   const id = c.req.param('id')
 
   const result = await videoService.getVideoById(id)
@@ -46,7 +48,7 @@ videoRoutes.get('/:id', async (c) => {
  * PATCH /api/videos/:id
  * Update video metadata
  */
-videoRoutes.patch('/:id', zValidator('json', updateVideoSchema), async (c) => {
+app.patch('/:id', zValidator('json', updateVideoSchema), async (c) => {
   const id = c.req.param('id')
   const data = c.req.valid('json') // Fully typed from schema!
 
@@ -59,7 +61,7 @@ videoRoutes.patch('/:id', zValidator('json', updateVideoSchema), async (c) => {
  * DELETE /api/videos/:id
  * Delete video and all associated assets
  */
-videoRoutes.delete('/:id', async (c) => {
+app.delete('/:id', async (c) => {
   const id = c.req.param('id')
 
   await videoService.deleteVideo(id)
@@ -67,4 +69,4 @@ videoRoutes.delete('/:id', async (c) => {
   return successResponse(c, { message: 'Video deleted successfully' })
 })
 
-export { videoRoutes }
+export default app

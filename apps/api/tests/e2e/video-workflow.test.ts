@@ -41,7 +41,7 @@ describe('Video Workflow E2E', () => {
     expect(dbVideo?.title).toBe('E2E Test Video')
 
     // 2. List videos - should include our video
-    const listRes = await client.get('/api/videos/list')
+    const listRes = await client.get('/api/videos')
     expect(listRes.status).toBe(200)
     expect(listRes.body.data.total).toBeGreaterThan(0)
 
