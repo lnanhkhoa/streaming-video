@@ -16,8 +16,7 @@ node_modules
 coverage
 
 # Turbo
-.turbo
-
+.turbo/
 # Vercel
 .vercel
 

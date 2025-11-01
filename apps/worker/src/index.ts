@@ -1,14 +1,15 @@
+import 'dotenv/config'
+import { env } from './env'
 import { prisma } from '@repo/database'
-import { storageService } from './services/storage'
 import { startWorker } from './consumer'
 import { startHealthServer } from './health'
 
 async function main() {
   console.log('🎬 Video processing worker starting...')
-  console.log('📦 Environment:', process.env.NODE_ENV || 'development')
-  console.log('🌐 RabbitMQ:', process.env.RABBITMQ_URL)
-  console.log('💾 Database:', process.env.DATABASE_URL?.split('@')[1])
-  console.log('📦 MinIO:', `${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}`)
+  console.log('📦 Environment:', env.NODE_ENV)
+  console.log('🌐 RabbitMQ:', env.RABBITMQ_URL)
+  console.log('💾 Database:', env.DATABASE_URL)
+  console.log('📦 MinIO:', `${env.MINIO_ENDPOINT}:${env.MINIO_PORT}`)
   console.log()
 
   try {

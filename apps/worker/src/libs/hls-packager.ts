@@ -5,7 +5,7 @@
  * during live streaming. Implements retry logic and cleanup.
  */
 
-import { storageService } from './services/storage'
+import { storageService } from '../services/storage'
 import path from 'node:path'
 
 export class HLSPackager {

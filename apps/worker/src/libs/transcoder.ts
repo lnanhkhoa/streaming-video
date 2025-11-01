@@ -2,6 +2,7 @@ import ffmpeg from 'fluent-ffmpeg'
 import path from 'node:path'
 import fsp from 'node:fs/promises'
 import fs from 'node:fs'
+import { env } from '../env'
 
 /**
  * FFmpeg Transcoder - VOD
@@ -39,8 +40,8 @@ const HLS_VARIANTS: HLSVariant[] = [
   { resolution: '480p', width: 854, height: 480, bitrate: 1400, audioBitrate: 96 }
 ]
 
-const FFMPEG_PRESET = process.env.FFMPEG_PRESET || 'medium'
-const FFMPEG_CRF = parseInt(process.env.FFMPEG_CRF || '23', 10)
+const FFMPEG_PRESET = env.FFMPEG_PRESET
+const FFMPEG_CRF = env.FFMPEG_CRF
 
 /**
  * Extract video metadata using ffprobe

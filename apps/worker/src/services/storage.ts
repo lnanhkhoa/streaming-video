@@ -13,6 +13,7 @@ import { Client } from 'minio'
 import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import path from 'node:path'
+import { env } from '../env'
 
 export interface StorageConfig {
   endpoint: string
@@ -215,11 +216,11 @@ export class StorageService {
 }
 
 export const storageService = new StorageService({
-  endpoint: process.env.MINIO_ENDPOINT || 'localhost',
-  port: parseInt(process.env.MINIO_PORT || '9000', 10),
-  useSSL: process.env.MINIO_USE_SSL === 'true',
-  accessKey: process.env.MINIO_ACCESS_KEY || process.env.MINIO_ROOT_USER || '',
-  secretKey: process.env.MINIO_SECRET_KEY || process.env.MINIO_ROOT_PASSWORD || '',
+  endpoint: env.MINIO_ENDPOINT || 'localhost',
+  port: env.MINIO_PORT,
+  useSSL: env.MINIO_USE_SSL,
+  accessKey: env.MINIO_ACCESS_KEY,
+  secretKey: env.MINIO_SECRET_KEY,
   bucket: 'streaming-video',
   uploadTimeoutMs: 30_000,
   downloadTimeoutMs: 60_000,

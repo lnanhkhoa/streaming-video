@@ -7,9 +7,9 @@
  */
 
 import { createServer } from 'node:http'
-import { metrics } from './metrics'
+import { env } from './env'
+import { metrics } from './services/metrics'
 
-const HEALTH_PORT = parseInt(process.env.HEALTH_PORT || '3002')
 
 export function startHealthServer(): void {
   const server = createServer((req, res) => {
@@ -35,10 +35,10 @@ export function startHealthServer(): void {
     }
   })
 
-  server.listen(HEALTH_PORT, () => {
-    console.log(`🏥 Health check server listening on http://localhost:${HEALTH_PORT}`)
-    console.log(`   Health: http://localhost:${HEALTH_PORT}/health`)
-    console.log(`   Metrics: http://localhost:${HEALTH_PORT}/metrics`)
+  server.listen(env.HEALTH_PORT, () => {
+    console.log(`🏥 Health check server listening on http://localhost:${env.HEALTH_PORT}`)
+    console.log(`   Health: http://localhost:${env.HEALTH_PORT}/health`)
+    console.log(`   Metrics: http://localhost:${env.HEALTH_PORT}/metrics`)
   })
 
   // Handle server errors

@@ -1,14 +1,15 @@
 import amqp from 'amqplib'
 import { prisma } from '@repo/database'
 import { storageService } from './services/storage'
-import { transcodeVideo, getVideoMetadata } from './transcoder'
-import { liveStreamManager } from './live-stream'
-import { metrics } from './metrics'
-import { retryWithBackoff, ensureDiskSpace, estimateRequiredSpace, formatBytes } from './utils'
+import { transcodeVideo, getVideoMetadata } from './libs/transcoder'
+import { liveStreamManager } from './libs/live-stream'
+import { metrics } from './services/metrics'
+import { retryWithBackoff, ensureDiskSpace, estimateRequiredSpace, formatBytes } from './libs/utils'
 import path from 'node:path'
 import os from 'node:os'
 import fsp from 'node:fs/promises'
 import fs from 'node:fs'
+import { env } from './env'
 
 /**
  * RabbitMQ Consumer
@@ -44,8 +45,8 @@ interface RabbitMQConnection {
 }
 
 const QUEUE_NAME = 'video-transcode'
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:password@localhost:5672'
-const TEMP_DIR = process.env.WORKER_TEMP_DIR || os.tmpdir()
+const RABBITMQ_URL = env.RABBITMQ_URL || 'amqp://admin:password@localhost:5672'
+const TEMP_DIR = env.WORKER_TEMP_DIR || os.tmpdir()
 
 /**
  * Connect to RabbitMQ and setup channel
