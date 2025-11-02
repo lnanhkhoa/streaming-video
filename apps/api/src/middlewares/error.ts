@@ -1,7 +1,7 @@
-import type { Context, ErrorHandler } from 'hono'
+import type { ErrorHandler } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { ZodError } from 'zod'
-import { handlePrismaError } from '../utils/errors.js'
+import { handlePrismaError } from '../utils/errors'
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -33,8 +33,8 @@ export const errorHandler: ErrorHandler = (err, c) => {
         error: {
           message: err.message,
           status: err.status,
-          ...(isDev && err.cause ? { cause: err.cause } : {}),
-        },
+          ...(isDev && err.cause ? { cause: err.cause } : {})
+        }
       },
       err.status
     )
@@ -53,9 +53,9 @@ export const errorHandler: ErrorHandler = (err, c) => {
           details: err.issues.map((e: any) => ({
             path: e.path.join('.'),
             message: e.message,
-            code: e.code,
-          })),
-        },
+            code: e.code
+          }))
+        }
       },
       400
     )
@@ -80,8 +80,8 @@ export const errorHandler: ErrorHandler = (err, c) => {
         message: isDev ? err.message : 'Internal Server Error',
         status: 500,
         code: 'INTERNAL_ERROR',
-        ...(isDev && { stack: err.stack }),
-      },
+        ...(isDev && { stack: err.stack })
+      }
     },
     500
   )

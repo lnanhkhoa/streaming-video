@@ -1,6 +1,6 @@
 import { prisma } from '@repo/database'
 import { cacheService } from './cache.service'
-import { NotFoundError } from '../utils/errors.js'
+import { NotFoundError } from '../utils/errors'
 
 interface VideoStats {
   viewsToday: number
@@ -52,7 +52,7 @@ class AnalyticsService {
   async getStats(videoId: string): Promise<VideoStats | null> {
     // Check cache
     const cached = await cacheService.getVideoStats<VideoStats>(videoId)
-    if (cached) return cached
+    // if (cached) return cached
 
     // Query database
     const video = await prisma.video.findUnique({

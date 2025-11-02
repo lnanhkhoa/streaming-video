@@ -1,70 +1,105 @@
 import { Hono } from 'hono'
-import { videoService } from '../services/video.service.js'
-import { successResponse } from '../utils/response.js'
-import { updateVideoSchema } from '../utils/validator.js'
-import { zValidator } from '../middlewares/validation.js'
-import { NotFoundError } from '../utils/errors.js'
+import { prisma } from '@repo/database'
+import { videoService } from '../services/video.service'
+import { successResponse } from '../utils/response'
+import { updateVideoSchema } from '../utils/validator'
+import { zValidator } from '../middlewares/validation'
+import { NotFoundError } from '../utils/errors'
 
-const videoRoutes = new Hono()
+const app = new Hono()
 
-/**
- * GET /api/videos/list
- * List videos with pagination and filters
- */
-videoRoutes.get('/list', async (c) => {
-  const limit = Number(c.req.query('limit')) || 20
-  const offset = Number(c.req.query('offset')) || 0
-  const status = c.req.query('status')
-  const videoType = c.req.query('videoType')
-  const visibility = c.req.query('visibility')
+export const videoRoutes = app
+  /**
+   * GET /api/videos
+   * List videos with pagination and filters
+   */
+  .get('/', async (c) => {
+    const limit = Number(c.req.query('limit')) || 20
+    const offset = Number(c.req.query('offset')) || 0
+    const status = c.req.query('status')
+    const videoType = c.req.query('videoType')
+    const visibility = c.req.query('visibility')
 
-  const result = await videoService.listVideos({
-    limit,
-    offset,
-    status,
-    videoType,
-    visibility
+    const result = await videoService.listVideos({
+      limit,
+      offset,
+      status,
+      videoType,
+      visibility
+    })
+
+    return successResponse(c, result)
   })
 
-  return successResponse(c, result)
-})
+  /**
+   * GET /api/videos/:id
+   * Get video details with variants and playback URLs
+   */
+  .get('/:id', async (c) => {
+    const id = c.req.param('id')
 
-/**
- * GET /api/videos/:id
- * Get video details with variants and playback URLs
- */
-videoRoutes.get('/:id', async (c) => {
-  const id = c.req.param('id')
+    const result = await videoService.getVideoById(id)
+    if (!result) throw new NotFoundError('Video', id)
 
-  const result = await videoService.getVideoById(id)
-  if (!result) throw new NotFoundError('Video', id)
+    return successResponse(c, result)
+  })
 
-  return successResponse(c, result)
-})
+  /**
+   * PATCH /api/videos/:id
+   * Update video metadata
+   */
+  .patch('/:id', zValidator('json', updateVideoSchema), async (c) => {
+    const id = c.req.param('id')
+    const data = c.req.valid('json') // Fully typed from schema!
 
-/**
- * PATCH /api/videos/:id
- * Update video metadata
- */
-videoRoutes.patch('/:id', zValidator('json', updateVideoSchema), async (c) => {
-  const id = c.req.param('id')
-  const data = c.req.valid('json') // Fully typed from schema!
+    const video = await videoService.updateVideo(id, data)
 
-  const video = await videoService.updateVideo(id, data)
+    return successResponse(c, { video })
+  })
 
-  return successResponse(c, { video })
-})
+  /**
+   * GET /api/videos/:id/progress
+   * Get transcoding progress
+   */
+  .get('/:id/progress', async (c) => {
+    const videoId = c.req.param('id')
 
-/**
- * DELETE /api/videos/:id
- * Delete video and all associated assets
- */
-videoRoutes.delete('/:id', async (c) => {
-  const id = c.req.param('id')
+    const video = await prisma.video.findUnique({
+      where: { id: videoId },
+      select: {
+        id: true,
+        status: true,
+        transcodingProgress: true,
+        transcodingStartedAt: true,
+        transcodingEstimatedEnd: true,
+        transcodingError: true,
+        duration: true
+      }
+    })
 
-  await videoService.deleteVideo(id)
+    if (!video) {
+      throw new NotFoundError('Video', videoId)
+    }
 
-  return successResponse(c, { message: 'Video deleted successfully' })
-})
+    return successResponse(c, {
+      videoId: video.id,
+      status: video.status,
+      progress: video.transcodingProgress || 0,
+      startedAt: video.transcodingStartedAt,
+      estimatedEnd: video.transcodingEstimatedEnd,
+      error: video.transcodingError,
+      duration: video.duration
+    })
+  })
 
-export { videoRoutes }
+  /**
+   * DELETE /api/videos/:id
+   * Delete video and all associated assets
+   */
+  .delete('/:id', async (c) => {
+    const id = c.req.param('id')
+
+    await videoService.deleteVideo(id)
+
+    return successResponse(c, { message: 'Video deleted successfully' })
+  })

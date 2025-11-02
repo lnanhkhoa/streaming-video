@@ -1,28 +1,29 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
-import { errorHandler } from './middlewares/error.js'
-import { videoRoutes } from './routes/videos.js'
-import { uploadRoutes } from './routes/upload.js'
-import { analyticsRoutes } from './routes/analytics.js'
-import { liveRoutes } from './routes/live.js'
+import { errorHandler } from './middlewares/error'
+import { videoRoutes } from './routes/videos'
+import { uploadRoutes } from './routes/upload'
+import { analyticsRoutes } from './routes/analytics'
+import { liveRoutes } from './routes/live'
+import { prettyJSON } from 'hono/pretty-json'
 
-const app = new Hono()
+// Create base app with middleware
 
-// Middleware
-app.use('*', logger())
-app.use('*', cors())
+const router = new Hono()
+router.use('*', logger())
+router.use('*', cors())
+router.use(prettyJSON())
+router.notFound((c) => c.json({ message: 'Not Found', ok: false }, 404))
 
-// Health check
-app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }))
+const app = router
+  .get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }))
+  .route('/api/videos', videoRoutes)
+  .route('/api/upload', uploadRoutes)
+  .route('/api/analytics', analyticsRoutes)
+  .route('/api/live', liveRoutes)
 
-// Routes
-app.route('/api/videos', videoRoutes)
-app.route('/api/upload', uploadRoutes)
-app.route('/api/analytics', analyticsRoutes)
-app.route('/api/live', liveRoutes)
-
-// Global error handler (must be last)
 app.onError(errorHandler)
 
 export { app }
+export type AppType = typeof app

@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./app/*"]
+      "@/*": ["./*"]
     },
     "plugins": [
       {
@@ -12,6 +12,7 @@
     ]
   },
   "include": [
+    "api/src/types/rpc.ts",
     "**/*.ts",
     "**/*.tsx",
     "next-env.d.ts",

@@ -1,4 +1,4 @@
-import { app } from '../../src/app'
+import app from '../../src/app'
 
 // Helper to create properly formatted test requests
 const createRequest = (path: string, options?: RequestInit) => {

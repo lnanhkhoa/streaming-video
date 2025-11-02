@@ -2,6 +2,7 @@
 export type VideoStatus = 'PENDING' | 'PROCESSING' | 'READY' | 'FAILED' | 'LIVE'
 export type VideoType = 'VOD' | 'LIVE'
 export type VideoVisibility = 'PUBLIC' | 'UNLISTED' | 'PRIVATE'
+export type AllowedVideoTypes = 'video/mp4' | 'video/webm' | 'video/ogg'
 
 // Video Interface
 export interface Video {

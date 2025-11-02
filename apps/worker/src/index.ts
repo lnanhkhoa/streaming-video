@@ -1,37 +1,66 @@
+import 'dotenv/config'
+import { env } from './env'
 import { prisma } from '@repo/database'
+import { startWorker } from './consumer'
+import { startHealthServer } from './health'
 
 async function main() {
   console.log('🎬 Video processing worker starting...')
-  console.log('📦 Environment:', process.env.NODE_ENV || 'development')
+  console.log('📦 Environment:', env.NODE_ENV)
+  console.log('🌐 RabbitMQ:', env.RABBITMQ_URL)
+  console.log('💾 Database:', env.DATABASE_URL)
+  console.log('📦 MinIO:', `${env.MINIO_ENDPOINT}:${env.MINIO_PORT}`)
+  console.log()
 
   try {
-    // Test database connection
+    // Connect to database
     await prisma.$connect()
     console.log('✅ Database connected')
 
-    console.log('✅ Worker ready (Phase 4 implementation pending)')
-    console.log('👉 This is a placeholder - full implementation in Phase 4')
+    // Storage service initializes on import
+    console.log('✅ MinIO connected')
+
+    // Start health check server
+    startHealthServer()
+
+    // Start RabbitMQ consumer
+    await startWorker()
+    console.log('✅ Worker ready and listening for jobs')
 
     // Keep process alive
     await new Promise(() => {})
   } catch (error) {
     console.error('❌ Worker failed to start:', error)
+    await prisma.$disconnect()
     process.exit(1)
   }
 }
 
 // Graceful shutdown
-process.on('SIGINT', async () => {
-  console.log('\n🛑 Shutting down worker...')
-  await prisma.$disconnect()
-  process.exit(0)
-})
+let isShuttingDown = false
 
-process.on('SIGTERM', async () => {
-  console.log('\n🛑 Shutting down worker...')
-  await prisma.$disconnect()
-  process.exit(0)
-})
+async function gracefulShutdown(signal: string) {
+  if (isShuttingDown) return
+  isShuttingDown = true
+
+  console.log(`\n🛑 Received ${signal}, shutting down gracefully...`)
+
+  try {
+    // RabbitMQ connections are closed in consumer shutdown handler
+    // Just need to disconnect database here
+    await prisma.$disconnect()
+    console.log('✅ Database disconnected')
+
+    console.log('✅ Worker shut down successfully')
+    process.exit(0)
+  } catch (error) {
+    console.error('❌ Error during shutdown:', error)
+    process.exit(1)
+  }
+}
+
+process.on('SIGINT', () => gracefulShutdown('SIGINT'))
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
 
 main().catch(async (error) => {
   console.error('❌ Fatal error:', error)

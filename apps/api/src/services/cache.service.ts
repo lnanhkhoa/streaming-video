@@ -100,6 +100,14 @@ class CacheService {
     }
   }
 
+  /**
+   * flush
+   */
+  async flushDb() {
+    if (!this.isConnected) return false
+    return this.client.flushdb()
+  }
+
   // Cache key generators
   keys = {
     videoList: () => 'video:list',

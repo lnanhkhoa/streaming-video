@@ -1,11 +1,12 @@
 import { nanoid } from 'nanoid'
 import { prisma } from '@repo/database'
-import { NotFoundError, UnauthorizedError, BadRequestError } from '../utils/errors.js'
+import { NotFoundError, UnauthorizedError, BadRequestError } from '../utils/errors'
+import { queueService } from './queue.service'
 
 interface CreateStreamResult {
   videoId: string
   streamKey: string
-  rtmpUrl: string
+  rtmpUrl: string | null
   playbackUrl: string
 }
 
@@ -41,9 +42,8 @@ class LiveService {
       }
     })
 
-    // TODO: In Phase 5, integrate with actual RTMP server
-    // For now, return placeholder URLs
-    const rtmpUrl = `rtmp://localhost:1935/live/${streamKey}`
+    // Note: RTMP streaming is not supported in MVP - direct MinIO access only
+    const rtmpUrl = null
     const playbackUrl = `${process.env.API_URL || 'http://localhost:3001'}/api/live/${videoId}/watch`
 
     console.log(`✅ Created live stream: ${videoId}`)
@@ -57,9 +57,9 @@ class LiveService {
   }
 
   /**
-   * Start live streaming (update status)
+   * Start live streaming (publish job to worker)
    */
-  async startStream(videoId: string, streamKey: string): Promise<void> {
+  async startStream(videoId: string, streamKey: string, inputSource?: string): Promise<void> {
     // Verify stream key for authentication
     const video = await prisma.video.findUnique({
       where: { id: videoId }
@@ -77,42 +77,57 @@ class LiveService {
       throw new BadRequestError('Not a live stream')
     }
 
-    // Update status to LIVE
-    await prisma.video.update({
-      where: { id: videoId },
-      data: {
-        status: 'LIVE',
-        isLiveNow: true
-      }
+    // Input source for live stream processing
+    const source = inputSource || streamKey
+
+    // Publish start live stream job to queue
+    const published = await queueService.publishStartLiveStreamJob({
+      type: 'start-live-stream',
+      videoId,
+      streamKey,
+      inputSource: source
     })
 
-    console.log(`✅ Stream started: ${videoId}`)
+    if (!published) {
+      throw new Error('Failed to publish start live stream job')
+    }
+
+    console.log(`✅ Start stream job published: ${videoId}`)
   }
 
   /**
-   * Stop live streaming
+   * Stop live streaming (publish stop job to worker)
    */
   async stopStream(videoId: string, convertToVOD: boolean = false): Promise<void> {
-    const updateData: any = {
-      isLiveNow: false
+    // Verify video exists
+    const video = await prisma.video.findUnique({
+      where: { id: videoId }
+    })
+
+    if (!video) {
+      throw new NotFoundError('Video', videoId)
+    }
+
+    if (video.videoType !== 'LIVE') {
+      throw new BadRequestError('Not a live stream')
+    }
+
+    // Publish stop live stream job to queue
+    const published = await queueService.publishStopLiveStreamJob({
+      type: 'stop-live-stream',
+      videoId,
+      convertToVOD
+    })
+
+    if (!published) {
+      throw new Error('Failed to publish stop live stream job')
     }
 
     if (convertToVOD) {
-      // Mark as PENDING for future VOD conversion
-      // Worker will process recorded stream file
-      updateData.status = 'PENDING'
-      console.log(`📼 Stream ${videoId} marked for VOD conversion`)
+      console.log(`📼 Stop stream job published (convert to VOD): ${videoId}`)
     } else {
-      // Just mark as completed live stream
-      updateData.status = 'READY'
+      console.log(`✅ Stop stream job published: ${videoId}`)
     }
-
-    await prisma.video.update({
-      where: { id: videoId },
-      data: updateData
-    })
-
-    console.log(`✅ Stream stopped: ${videoId}`)
   }
 
   /**

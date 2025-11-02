@@ -1,125 +1,131 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
-import { liveService } from '../services/live.service.js'
-import { successResponse } from '../utils/response.js'
-import { createLiveStreamSchema } from '../utils/validator.js'
-import { zValidator } from '../middlewares/validation.js'
-import { BadRequestError } from '../utils/errors.js'
-
-const liveRoutes = new Hono()
+import { liveService } from '../services/live.service'
+import { successResponse } from '../utils/response'
+import { createLiveStreamSchema } from '../utils/validator'
+import { zValidator } from '../middlewares/validation'
+import { BadRequestError } from '../utils/errors'
+import { Bindings } from 'hono/types'
 
 // Validation schemas for live stream operations
 const startStreamSchema = z.object({
   streamKey: z.string().min(1, 'Stream key is required'),
+  inputSource: z.string().optional() // Optional: RTMP URL, file path, or HTTP stream URL
 })
 
 const stopStreamSchema = z.object({
-  convertToVOD: z.boolean().optional().default(false),
+  convertToVOD: z.boolean().optional().default(false)
 })
 
 const visibilitySchema = z.object({
-  visibility: z.enum(['PUBLIC', 'UNLISTED', 'PRIVATE']),
+  visibility: z.enum(['PUBLIC', 'UNLISTED', 'PRIVATE'])
 })
 
-/**
- * POST /api/live/create
- * Create new live stream session
- */
-liveRoutes.post('/create', zValidator('json', createLiveStreamSchema), async (c) => {
-  const { title, description } = c.req.valid('json')
+export const liveRoutes = new Hono<{ Bindings: Bindings }>()
+  /**
+   * POST /api/live/create
+   * Create new live stream session
+   */
+  .post('/create', zValidator('json', createLiveStreamSchema), async (c) => {
+    const { title, description } = c.req.valid('json')
 
-  const result = await liveService.createStream(title, description)
+    const result = await liveService.createStream(title, description)
 
-  return successResponse(c, result, 201)
-})
-
-/**
- * POST /api/live/:id/start
- * Start live streaming
- */
-liveRoutes.post('/:id/start', zValidator('json', startStreamSchema), async (c) => {
-  const videoId = c.req.param('id')
-  const { streamKey } = c.req.valid('json')
-
-  await liveService.startStream(videoId, streamKey)
-
-  return successResponse(c, {
-    message: 'Stream started successfully',
-    status: 'LIVE',
+    return successResponse(c, result, 201)
   })
-})
 
-/**
- * POST /api/live/:id/stop
- * Stop live streaming
- */
-liveRoutes.post('/:id/stop', zValidator('json', stopStreamSchema), async (c) => {
-  const videoId = c.req.param('id')
-  const { convertToVOD } = c.req.valid('json')
+  /**
+   * POST /api/live/:id/start
+   * Start live streaming
+   */
+  .post('/:id/start', zValidator('json', startStreamSchema), async (c) => {
+    const videoId = c.req.param('id')
+    const { streamKey, inputSource } = c.req.valid('json')
 
-  await liveService.stopStream(videoId, convertToVOD)
+    await liveService.startStream(videoId, streamKey, inputSource)
 
-  return successResponse(c, {
-    message: 'Stream stopped successfully',
-    status: convertToVOD ? 'PENDING' : 'READY',
+    return successResponse(c, {
+      message: 'Stream started successfully',
+      videoId,
+      status: 'LIVE'
+    })
   })
-})
 
-/**
- * GET /api/live/active
- * Get all active live streams
- */
-liveRoutes.get('/active', async (c) => {
-  const streams = await liveService.getActiveStreams()
+  /**
+   * POST /api/live/:id/stop
+   * Stop live streaming
+   */
+  .post('/:id/stop', zValidator('json', stopStreamSchema), async (c) => {
+    const videoId = c.req.param('id')
+    const { convertToVOD } = c.req.valid('json')
 
-  return successResponse(c, { streams, count: streams.length })
-})
+    await liveService.stopStream(videoId, convertToVOD)
 
-/**
- * GET /api/live/:id
- * Get stream details
- */
-liveRoutes.get('/:id', async (c) => {
-  const videoId = c.req.param('id')
-  const stream = await liveService.getStream(videoId)
-
-  return successResponse(c, { stream })
-})
-
-/**
- * PATCH /api/live/:id/visibility
- * Update stream visibility
- */
-liveRoutes.patch('/:id/visibility', zValidator('json', visibilitySchema), async (c) => {
-  const videoId = c.req.param('id')
-  const { visibility } = c.req.valid('json')
-
-  await liveService.updateStreamVisibility(videoId, visibility)
-
-  return successResponse(c, {
-    message: 'Visibility updated successfully',
-    visibility,
+    return successResponse(c, {
+      message: 'Stream stopped successfully',
+      status: convertToVOD ? 'PENDING' : 'READY'
+    })
   })
-})
 
-/**
- * GET /api/live/:id/watch
- * Stream playback endpoint (placeholder)
- */
-liveRoutes.get('/:id/watch', async (c) => {
-  const videoId = c.req.param('id')
-  const stream = await liveService.getStream(videoId)
+  /**
+   * GET /api/live/active
+   * Get all active live streams
+   */
+  .get('/active', async (c) => {
+    const streams = await liveService.getActiveStreams()
 
-  if (!stream.isLiveNow) {
-    throw new BadRequestError('Stream is not currently live')
-  }
-
-  // TODO: Phase 5 - Return HLS manifest or player URL
-  return successResponse(c, {
-    message: 'Playback not yet implemented',
-    stream,
-    note: 'Will integrate with RTMP server in Phase 5',
+    return successResponse(c, { streams, count: streams.length })
   })
-})
 
-export { liveRoutes }
+  /**
+   * GET /api/live/:id
+   * Get stream details
+   */
+  .get('/:id', async (c) => {
+    const videoId = c.req.param('id')
+    const stream = await liveService.getStream(videoId)
+
+    return successResponse(c, { stream })
+  })
+
+  /**
+   * PATCH /api/live/:id/visibility
+   * Update stream visibility
+   */
+  .patch('/:id/visibility', zValidator('json', visibilitySchema), async (c) => {
+    const videoId = c.req.param('id')
+    const { visibility } = c.req.valid('json')
+
+    await liveService.updateStreamVisibility(videoId, visibility)
+
+    return successResponse(c, {
+      message: 'Visibility updated successfully',
+      visibility
+    })
+  })
+
+  /**
+   * GET /api/live/:id/watch
+   * Get HLS playback URL from MinIO
+   */
+  .get('/:id/watch', async (c) => {
+    const videoId = c.req.param('id')
+    const stream = await liveService.getStream(videoId)
+
+    if (stream.videoType !== 'LIVE') {
+      throw new BadRequestError('Not a live stream')
+    }
+
+    // HLS manifest URL from MinIO processed bucket
+    const hlsUrl = stream.hlsManifestKey
+      ? `${process.env.NEXT_PUBLIC_STORAGE_URL}/videos-processed/${stream.hlsManifestKey}`
+      : null
+
+    return successResponse(c, {
+      videoId: stream.id,
+      title: stream.title,
+      isLive: stream.isLiveNow,
+      hlsUrl,
+      status: stream.status
+    })
+  })

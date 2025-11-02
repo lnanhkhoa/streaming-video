@@ -13,56 +13,7 @@ Comprehensive testing, error handling, loading states, responsive design, and fi
 
 ### 1. Error Handling
 
-#### 1.1 API Error Handling
-
-**Update `apps/api/src/middlewares/error.ts`**:
-
-```typescript
-import { Context } from 'hono'
-import { ZodError } from 'zod'
-
-export function errorHandler(err: Error, c: Context) {
-  console.error('Error:', err)
-
-  // Zod validation errors
-  if (err instanceof ZodError) {
-    return c.json(
-      {
-        error: 'Validation failed',
-        details: err.errors.map((e) => ({
-          field: e.path.join('.'),
-          message: e.message
-        }))
-      },
-      400
-    )
-  }
-
-  // Known application errors
-  if (err.message.includes('not found')) {
-    return c.json({ error: err.message }, 404)
-  }
-
-  if (err.message.includes('already exists')) {
-    return c.json({ error: err.message }, 409)
-  }
-
-  // Database errors
-  if (err.message.includes('Unique constraint')) {
-    return c.json({ error: 'Resource already exists' }, 409)
-  }
-
-  // Default error
-  return c.json(
-    {
-      error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message
-    },
-    500
-  )
-}
-```
-
-#### 1.2 Frontend Error Handling
+#### 1.1 Frontend Error Handling
 
 **Create `apps/web/components/ErrorBoundary.tsx`**:
 
