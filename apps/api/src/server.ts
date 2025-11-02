@@ -4,9 +4,6 @@ import { env } from './env'
 import { initializeScheduler } from './utils/scheduler'
 import { cacheService } from './services/cache.service'
 
-// Export AppType for RPC client type inference
-export type AppType = typeof app
-
 const port = env.PORT
 
 async function startServer() {

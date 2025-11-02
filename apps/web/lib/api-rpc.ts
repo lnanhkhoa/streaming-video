@@ -1,27 +1,15 @@
-import { rpcClient } from './rpc-client'
-
-/**
- * RPC-based API client
- *
- * Uses Hono RPC for runtime requests but with explicit TypeScript types
- * for compile-time safety. This hybrid approach provides:
- * - Runtime: Full RPC functionality with automatic request/response handling
- * - Compile-time: Explicit types from @repo/constants package
- */
-
-// Re-export types from @repo/constants
-export type {
+import { AppType } from '@apps/api'
+import type {
   Video,
-  VideoVariant,
-  VideoStatus,
-  VideoType,
-  VideoVisibility,
+  VideoStatsResponse,
   CreateLiveStreamRequest,
-  PresignUploadRequest,
-  VideoStatsResponse
+  VideoVisibility,
+  AllowedVideoTypes
 } from '@repo/constants'
+import { hc } from 'hono/client'
 
-import type { Video, VideoStatsResponse, CreateLiveStreamRequest } from '@repo/constants'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+export const rpcClient = hc<AppType>(API_URL)
 
 /**
  * Helper to unwrap API responses from { success: true, data: T } to T
@@ -50,9 +38,7 @@ export const videoAPI = {
     visibility?: string
     liveOnly?: boolean
   }): Promise<{ videos: Video[]; total: number; hasMore: boolean }> => {
-    const res = await (rpcClient as any).api.videos.$get({
-      query: params as any
-    })
+    const res = await rpcClient.api.videos.$get({ query: params })
     return unwrapResponse(res)
   },
 
@@ -60,7 +46,7 @@ export const videoAPI = {
    * Get video by ID with variants and playback URLs
    */
   getVideo: async (id: string): Promise<{ video: Video }> => {
-    const res = await (rpcClient as any).api.videos[':id'].$get({ param: { id } })
+    const res = await rpcClient.api.videos[':id'].$get({ param: { id } })
     return unwrapResponse(res)
   },
 
@@ -72,10 +58,10 @@ export const videoAPI = {
     data: {
       title?: string
       description?: string
-      visibility?: string
+      visibility?: VideoVisibility
     }
   ): Promise<{ video: Video }> => {
-    const res = await (rpcClient as any).api.videos[':id'].$patch({
+    const res = await rpcClient.api.videos[':id'].$patch({
       param: { id },
       json: data
     })
@@ -86,7 +72,7 @@ export const videoAPI = {
    * Delete video and all associated assets
    */
   deleteVideo: async (id: string): Promise<{ message: string }> => {
-    const res = await (rpcClient as any).api.videos[':id'].$delete({
+    const res = await rpcClient.api.videos[':id'].$delete({
       param: { id }
     })
     return unwrapResponse(res)
@@ -99,7 +85,7 @@ export const analyticsAPI = {
    * Track a video view
    */
   trackView: async (id: string): Promise<{ message: string }> => {
-    const res = await (rpcClient as any).api.analytics.view[':id'].$post({
+    const res = await rpcClient.api.analytics.view[':id'].$post({
       param: { id }
     })
     return unwrapResponse(res)
@@ -109,7 +95,7 @@ export const analyticsAPI = {
    * Get video statistics
    */
   getStats: async (id: string): Promise<VideoStatsResponse> => {
-    const res = await (rpcClient as any).api.analytics.stats[':id'].$get({ param: { id } })
+    const res = await rpcClient.api.analytics.stats[':id'].$get({ param: { id } })
     return unwrapResponse(res)
   }
 }
@@ -126,7 +112,7 @@ export const liveAPI = {
     streamKey: string
     rtmpUrl: string
   }> => {
-    const res = await (rpcClient as any).api.live.create.$post({
+    const res = await rpcClient.api.live.create.$post({
       json: data
     })
     return unwrapResponse(res)
@@ -142,7 +128,7 @@ export const liveAPI = {
     videoId: string
     status: string
   }> => {
-    const res = await (rpcClient as any).api.live[':id'].start.$post({
+    const res = await rpcClient.api.live[':id'].start.$post({
       param: { id: videoId },
       json: { streamKey: '' } // Will be validated by API
     })
@@ -158,7 +144,7 @@ export const liveAPI = {
     message: string
     status: string
   }> => {
-    const res = await (rpcClient as any).api.live[':id'].stop.$post({
+    const res = await rpcClient.api.live[':id'].stop.$post({
       param: { id: videoId },
       json: {}
     })
@@ -174,16 +160,14 @@ export const uploadAPI = {
   getPresignedUrl: async (data: {
     fileName: string
     fileSize: number
-    contentType: string
+    contentType: AllowedVideoTypes
   }): Promise<{
     videoId: string
     uploadUrl: string
     key: string
     expiresIn: number
   }> => {
-    const res = await (rpcClient as any).api.upload.presign.$post({
-      json: data
-    })
+    const res = await rpcClient.api.upload.presign.$post({ json: data })
     return unwrapResponse(res)
   },
 
@@ -198,7 +182,7 @@ export const uploadAPI = {
       description?: string
     }
   ): Promise<{ video: Video }> => {
-    const res = await (rpcClient as any).api.upload[':id'].complete.$post({
+    const res = await rpcClient.api.upload[':id'].complete.$post({
       param: { id: videoId },
       json: data
     })

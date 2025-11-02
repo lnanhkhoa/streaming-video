@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { type Video } from '@/lib/api-rpc'
+import type { Video } from '@repo/constants'
 import { VideoStats } from './VideoStats'
 
 interface VideoCardProps {
@@ -11,7 +11,7 @@ interface VideoCardProps {
 }
 
 export function VideoCard({ video }: VideoCardProps) {
-  const thumbnailUrl = `${process.env.NEXT_PUBLIC_HLS_URL}/${video.thumbnailKey}`
+  const thumbnailUrl = `${process.env.NEXT_PUBLIC_API_URL}/${video.thumbnailKey}`
   return (
     <Link href={`/videos/${video.id}`}>
       <Card className="hover:shadow-lg transition-shadow cursor-pointer">

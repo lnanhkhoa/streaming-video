@@ -1,11 +1,14 @@
 {
-  "name": "api",
+  "name": "@apps/api",
   "version": "0.0.1",
   "private": true,
+  "exports": {
+    ".": "./src/app.ts"
+  },
   "scripts": {
-    "dev": "bun --watch src/index.ts",
+    "dev": "bun --watch src/server.ts",
     "build": "tsup",
-    "start": "bun src/index.ts",
+    "start": "bun src/server.ts",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
     "test": "bash scripts/run-integration.sh",
@@ -36,6 +39,7 @@
     "@vitest/coverage-v8": "^4.0.6",
     "eslint": "9.39.0",
     "tsup": "^8.3.5",
+    "tsx": "^4.0.1",
     "typescript": "5.9.3",
     "vitest": "^4.0.6",
     "@vitest/ui": "^4.0.6"

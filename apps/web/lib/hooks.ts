@@ -1,7 +1,8 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { videoAPI, liveAPI, uploadAPI, analyticsAPI, type Video } from './api-rpc'
+import { videoAPI, liveAPI, uploadAPI, analyticsAPI } from './api-rpc'
+import { AllowedVideoTypes } from '@repo/constants'
 
 // Query keys
 export const queryKeys = {
@@ -19,7 +20,7 @@ export function useVideos(liveOnly?: boolean) {
     queryKey: queryKeys.videoList(liveOnly),
     queryFn: async () => {
       const result = await videoAPI.listVideos(liveOnly ? { liveOnly } : undefined)
-      return result.videos // Return just the videos array for backward compatibility
+      return result.videos
     },
     staleTime: 30 * 1000 // 30 seconds
   })
@@ -85,7 +86,7 @@ export function useStopLiveStream() {
 // Upload mutations
 export function useGetPresignedUrl() {
   return useMutation({
-    mutationFn: (data: { fileName: string; fileSize: number; contentType: string }) =>
+    mutationFn: (data: { fileName: string; fileSize: number; contentType: AllowedVideoTypes }) =>
       uploadAPI.getPresignedUrl(data)
   })
 }

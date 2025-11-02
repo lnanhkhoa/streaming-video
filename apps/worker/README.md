@@ -98,7 +98,7 @@ MINIO_ACCESS_KEY=admin
 MINIO_SECRET_KEY=password
 
 # Worker Configuration
-WORKER_TEMP_DIR=/tmp/transcode
+WORKER_TEMP_DIR=./tmp/transcode
 FFMPEG_PRESET=medium        # veryfast|faster|fast|medium|slow
 FFMPEG_CRF=23               # Quality: 18-28 (lower = better)
 HEALTH_PORT=3002            # Health check HTTP server port

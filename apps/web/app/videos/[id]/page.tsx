@@ -2,7 +2,6 @@
 
 import { useVideo } from '@/lib/hooks'
 import { VideoPlayer } from '@/components/video/VideoPlayer'
-import { VideoStats } from '@/components/video/VideoStats'
 import { Badge } from '@/components/ui/badge'
 import { useParams } from 'next/navigation'
 
@@ -32,7 +31,7 @@ export default function VideoPage() {
     )
   }
 
-  const manifestUrl = `${process.env.NEXT_PUBLIC_HLS_URL}/${video.hlsManifestKey}`
+  const manifestUrl = `${process.env.NEXT_PUBLIC_API_URL}/${video.hlsManifestKey}`
   if (!video.hlsManifestKey) {
     return (
       <main className="container mx-auto p-8">

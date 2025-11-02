@@ -1,4 +1,4 @@
-import { type Video } from '@/lib/api-rpc'
+import type { Video } from '@repo/constants'
 import { VideoCard } from './VideoCard'
 
 interface VideoListProps {
