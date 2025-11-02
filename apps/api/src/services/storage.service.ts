@@ -1,13 +1,14 @@
 import { Client } from 'minio'
 import { Readable } from 'stream'
 import { env } from '../env'
+import { BUCKET_PROCESSED, BUCKET_RAW, BUCKET_THUMBNAILS } from '@repo/constants'
 
 class StorageService {
   private client: Client
   private buckets = {
-    raw: 'videos-raw',
-    processed: 'videos-processed',
-    thumbnails: 'thumbnails'
+    raw: BUCKET_RAW,
+    processed: BUCKET_PROCESSED,
+    thumbnails: BUCKET_THUMBNAILS
   }
 
   constructor() {
@@ -23,12 +24,29 @@ class StorageService {
   }
 
   private async initBuckets() {
-    for (const bucket of Object.values(this.buckets)) {
+    for (const [bucketType, bucket] of Object.entries(this.buckets)) {
       try {
         const exists = await this.client.bucketExists(bucket)
         if (!exists) {
           await this.client.makeBucket(bucket)
           console.log(`✅ Created bucket: ${bucket}`)
+        }
+
+        // Set processed and thumbnails buckets as public
+        if (bucketType === 'processed' || bucketType === 'thumbnails') {
+          const policy = {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: '*',
+                Action: ['s3:GetObject'],
+                Resource: [`arn:aws:s3:::${bucket}/*`]
+              }
+            ]
+          }
+          await this.client.setBucketPolicy(bucket, JSON.stringify(policy))
+          console.log(`🔓 Set ${bucket} as public`)
         }
       } catch (error) {
         console.error(`Failed to initialize bucket ${bucket}:`, error)

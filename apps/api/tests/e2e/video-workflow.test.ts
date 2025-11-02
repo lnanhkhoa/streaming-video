@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { nanoid } from 'nanoid'
 import { prisma } from '@repo/database'
 import { client } from '../helpers/client'
+import { BUCKET_RAW } from '@repo/constants'
 
 describe('Video Workflow E2E', () => {
   it('should complete full video lifecycle', async () => {
@@ -87,7 +88,7 @@ describe('Video Workflow E2E', () => {
 
     expect(presignRes.status).toBe(201)
     expect(presignRes.body.data.videoId).toBeDefined()
-    expect(presignRes.body.data.uploadUrl).toContain('videos-raw')
+    expect(presignRes.body.data.uploadUrl).toContain(BUCKET_RAW)
     expect(presignRes.body.data.key).toContain('original.mp4')
 
     const { videoId, key } = presignRes.body.data

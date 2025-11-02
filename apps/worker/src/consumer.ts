@@ -47,6 +47,7 @@ interface RabbitMQConnection {
 const QUEUE_NAME = 'video-transcode'
 const RABBITMQ_URL = env.RABBITMQ_URL || 'amqp://admin:password@localhost:5672'
 const TEMP_DIR = env.WORKER_TEMP_DIR || os.tmpdir()
+const WORKER_CONCURRENCY = env.WORKER_CONCURRENCY
 
 /**
  * Connect to RabbitMQ and setup channel
@@ -66,11 +67,11 @@ async function connectRabbitMQ(): Promise<RabbitMQConnection> {
         durable: true // Survive broker restart
       })
 
-      // Process one job at a time
-      await channel.prefetch(1)
+      // Set prefetch for concurrent job processing
+      await channel.prefetch(WORKER_CONCURRENCY)
 
       console.log('✅ Connected to RabbitMQ')
-      console.log(`📋 Queue: ${QUEUE_NAME} (durable, prefetch=1)`)
+      console.log(`📋 Queue: ${QUEUE_NAME} (durable, prefetch=${WORKER_CONCURRENCY})`)
 
       return { connection: connection as any, channel: channel as any }
     } catch (error) {
@@ -156,22 +157,31 @@ async function processTranscodeJob(job: TranscodeJob): Promise<void> {
   console.log(`   Input: ${inputKey}`)
 
   try {
-    // 1. Update status to PROCESSING
+    // 1. Update status to PROCESSING with start time
     await prisma.video.update({
       where: { id: videoId },
-      data: { status: 'PROCESSING' }
+      data: {
+        status: 'PROCESSING',
+        transcodingStartedAt: new Date(),
+        transcodingProgress: 0
+      }
     })
-    console.log('   📝 Status: PROCESSING')
+    console.log('   📝 Status: PROCESSING (0%)')
 
     // 2. Create temp directories
     await fsp.mkdir(tempDir, { recursive: true })
     await fsp.mkdir(outputDir, { recursive: true })
 
-    // 3. Download from MinIO with retry
+    // 3. Download from MinIO with retry (20% progress)
     console.log('   ⬇️  Downloading from MinIO...')
     await retryWithBackoff(() => storageService.downloadFile(inputKey, inputPath), {
       maxRetries: 3,
       operationName: 'Download from MinIO'
+    })
+
+    await prisma.video.update({
+      where: { id: videoId },
+      data: { transcodingProgress: 20 }
     })
 
     // 4. Check disk space
@@ -180,17 +190,27 @@ async function processTranscodeJob(job: TranscodeJob): Promise<void> {
     console.log(`   💾 Input size: ${formatBytes(inputFileSize)}`)
     await ensureDiskSpace(requiredSpace, TEMP_DIR)
 
-    // 4. Extract metadata for duration
+    // 5. Extract metadata for duration (30% progress)
     const metadata = await getVideoMetadata(inputPath)
     console.log(
       `   📊 Duration: ${metadata.duration.toFixed(1)}s, ${metadata.width}x${metadata.height}`
     )
 
-    // 5. Transcode
+    await prisma.video.update({
+      where: { id: videoId },
+      data: { transcodingProgress: 30 }
+    })
+
+    // 6. Transcode (30-80% progress)
     console.log('   🎥 Transcoding to HLS...')
     await transcodeVideo(inputPath, outputDir, videoId)
 
-    // 6. Upload outputs to MinIO with retry
+    await prisma.video.update({
+      where: { id: videoId },
+      data: { transcodingProgress: 80 }
+    })
+
+    // 7. Upload outputs to MinIO with retry (80-90% progress)
     console.log('   ⬆️  Uploading outputs to MinIO...')
     const uploadedFiles = await retryWithBackoff(
       () => storageService.uploadDirectory(outputDir, `videos/${videoId}`),
@@ -201,21 +221,24 @@ async function processTranscodeJob(job: TranscodeJob): Promise<void> {
     )
     console.log(`   ✅ Uploaded ${uploadedFiles.length} files`)
 
-    // 7. Create VideoVariant records
+    await prisma.video.update({
+      where: { id: videoId },
+      data: { transcodingProgress: 90 }
+    })
+
+    // 8. Create VideoVariant records (95% progress)
     console.log('   💾 Creating variant records...')
     await createVariantRecords(videoId, uploadedFiles)
 
-    // 8. Find thumbnail
-    const thumbnailKey = uploadedFiles.find((f) => f.includes('thumbnail.jpg'))
-
-    // 9. Update video to READY
+    // 9. Update video to READY (100% progress)
     await prisma.video.update({
       where: { id: videoId },
       data: {
         status: 'READY',
         duration: Math.round(metadata.duration),
         hlsManifestKey: `videos/${videoId}/master.m3u8`,
-        thumbnailKey: thumbnailKey || null
+        transcodingProgress: 100,
+        transcodingError: null
       }
     })
 
@@ -229,10 +252,13 @@ async function processTranscodeJob(job: TranscodeJob): Promise<void> {
     // Record failed job
     metrics.recordJobComplete(videoId, false)
 
-    // Update status to FAILED
+    // Update status to FAILED with error message
     await prisma.video.update({
       where: { id: videoId },
-      data: { status: 'FAILED' }
+      data: {
+        status: 'FAILED',
+        transcodingError: error instanceof Error ? error.message : String(error)
+      }
     })
 
     throw error
@@ -253,7 +279,7 @@ async function processTranscodeJob(job: TranscodeJob): Promise<void> {
 export async function startWorker(): Promise<void> {
   const { connection, channel } = await connectRabbitMQ()
 
-  console.log('🎧 Listening for transcode jobs...\n')
+  console.log(`🎧 Listening for transcode jobs (${WORKER_CONCURRENCY} concurrent)...\n`)
 
   // Consume messages
   await channel.consume(

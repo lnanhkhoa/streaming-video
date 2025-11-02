@@ -6,7 +6,7 @@ import { queueService } from './queue.service'
 interface CreateStreamResult {
   videoId: string
   streamKey: string
-  rtmpUrl: string
+  rtmpUrl: string | null
   playbackUrl: string
 }
 
@@ -42,8 +42,8 @@ class LiveService {
       }
     })
 
-    // RTMP URL for OBS streaming
-    const rtmpUrl = `${process.env.RTMP_SERVER_URL || 'rtmp://localhost:1935/live'}/${streamKey}`
+    // Note: RTMP streaming is not supported in MVP - direct MinIO access only
+    const rtmpUrl = null
     const playbackUrl = `${process.env.API_URL || 'http://localhost:3001'}/api/live/${videoId}/watch`
 
     console.log(`✅ Created live stream: ${videoId}`)
@@ -77,8 +77,8 @@ class LiveService {
       throw new BadRequestError('Not a live stream')
     }
 
-    // Default input source (can be RTMP URL, file path, or HTTP stream)
-    const source = inputSource || `rtmp://localhost:1935/live/${streamKey}`
+    // Input source for live stream processing
+    const source = inputSource || streamKey
 
     // Publish start live stream job to queue
     const published = await queueService.publishStartLiveStreamJob({
@@ -189,53 +189,6 @@ class LiveService {
     })
 
     console.log(`✅ Stream ${videoId} visibility updated to ${visibility}`)
-  }
-
-  /**
-   * Verify stream key and auto-start stream
-   * Called by nginx-rtmp on_publish callback
-   */
-  async verifyAndStartStream(streamKey: string): Promise<boolean> {
-    const video = await prisma.video.findUnique({
-      where: { streamKey }
-    })
-
-    if (!video || video.videoType !== 'LIVE') {
-      return false
-    }
-
-    // Auto-start stream on successful publish
-    await prisma.video.update({
-      where: { id: video.id },
-      data: {
-        status: 'LIVE',
-        isLiveNow: true
-      }
-    })
-
-    console.log(`✅ Auth success: Stream ${video.id} (${video.title})`)
-    return true
-  }
-
-  /**
-   * Handle stream unpublish (stream stopped)
-   * Called by nginx-rtmp on_publish_done callback
-   */
-  async handleUnpublish(streamKey: string): Promise<void> {
-    const video = await prisma.video.findUnique({
-      where: { streamKey }
-    })
-
-    if (video) {
-      await prisma.video.update({
-        where: { id: video.id },
-        data: {
-          status: 'READY',
-          isLiveNow: false
-        }
-      })
-      console.log(`🛑 Stream stopped: ${video.id}`)
-    }
   }
 }
 

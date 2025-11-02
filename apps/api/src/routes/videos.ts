@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-
+import { prisma } from '@repo/database'
 import { videoService } from '../services/video.service'
 import { successResponse } from '../utils/response'
 import { updateVideoSchema } from '../utils/validator'
@@ -55,6 +55,41 @@ export const videoRoutes = app
     const video = await videoService.updateVideo(id, data)
 
     return successResponse(c, { video })
+  })
+
+  /**
+   * GET /api/videos/:id/progress
+   * Get transcoding progress
+   */
+  .get('/:id/progress', async (c) => {
+    const videoId = c.req.param('id')
+
+    const video = await prisma.video.findUnique({
+      where: { id: videoId },
+      select: {
+        id: true,
+        status: true,
+        transcodingProgress: true,
+        transcodingStartedAt: true,
+        transcodingEstimatedEnd: true,
+        transcodingError: true,
+        duration: true
+      }
+    })
+
+    if (!video) {
+      throw new NotFoundError('Video', videoId)
+    }
+
+    return successResponse(c, {
+      videoId: video.id,
+      status: video.status,
+      progress: video.transcodingProgress || 0,
+      startedAt: video.transcodingStartedAt,
+      estimatedEnd: video.transcodingEstimatedEnd,
+      error: video.transcodingError,
+      duration: video.duration
+    })
   })
 
   /**

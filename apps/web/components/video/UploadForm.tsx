@@ -65,7 +65,7 @@ export function UploadForm() {
       const { videoId, uploadUrl, key } = await getPresignedUrl({
         fileName: selectedFile.name,
         fileSize: selectedFile.size,
-        contentType: selectedFile.type
+        contentType: selectedFile.type as any
       })
 
       // 2. Upload file directly to MinIO

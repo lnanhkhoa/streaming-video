@@ -46,7 +46,8 @@ const schema = z.object({
   FFMPEG_CRF: z.coerce.number().min(0).max(51).default(23),
 
   // Worker configuration
-  WORKER_TEMP_DIR: z.string().optional()
+  WORKER_TEMP_DIR: z.string().optional(),
+  WORKER_CONCURRENCY: z.coerce.number().min(1).max(16).default(1)
 })
 
 const parsed = schema.safeParse({
@@ -74,7 +75,8 @@ const parsed = schema.safeParse({
   FFMPEG_PRESET: process.env.FFMPEG_PRESET,
   FFMPEG_CRF: process.env.FFMPEG_CRF,
 
-  WORKER_TEMP_DIR: process.env.WORKER_TEMP_DIR
+  WORKER_TEMP_DIR: process.env.WORKER_TEMP_DIR,
+  WORKER_CONCURRENCY: process.env.WORKER_CONCURRENCY
 })
 
 if (!parsed.success) {

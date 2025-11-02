@@ -1,3 +1,4 @@
+import { env } from '@/env'
 import { AppType } from '@apps/api'
 import type {
   Video,
@@ -8,8 +9,7 @@ import type {
 } from '@repo/constants'
 import { hc } from 'hono/client'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-export const rpcClient = hc<AppType>(API_URL)
+export const rpcClient = hc<AppType>(env.API_URL)
 
 /**
  * Helper to unwrap API responses from { success: true, data: T } to T

@@ -352,7 +352,7 @@ class LiveStreamManager {
     // Strategy:
     // 1. Download all segments from MinIO (live/{videoId}/segment_*.ts)
     // 2. Use FFmpeg concat to merge into single MP4
-    // 3. Upload merged file to MinIO (videos-raw/)
+    // 3. Upload merged file to MinIO (BUCKET_RAW/)
     // 4. Trigger standard transcode job via RabbitMQ
     // 5. Clean up live segments after transcode completes
 

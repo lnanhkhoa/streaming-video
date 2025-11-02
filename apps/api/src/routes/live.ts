@@ -35,59 +35,6 @@ export const liveRoutes = new Hono<{ Bindings: Bindings }>()
   })
 
   /**
-   * POST /api/live/verify
-   * nginx-rtmp authentication callback
-   * Returns 200 if streamKey valid, 403 otherwise
-   */
-  .post('/verify', async (c) => {
-    try {
-      // nginx-rtmp sends streamKey as 'name' in form data
-      const body = await c.req.parseBody()
-      const streamKey = body.name as string
-
-      if (!streamKey) {
-        console.warn('⛔ Auth failed: No stream key provided')
-        return c.text('Forbidden', 403)
-      }
-
-      // Verify stream key and auto-start stream
-      const verified = await liveService.verifyAndStartStream(streamKey)
-
-      if (!verified) {
-        console.warn(`⛔ Auth failed: Invalid stream key ${streamKey}`)
-        return c.text('Forbidden', 403)
-      }
-
-      return c.text('OK', 200)
-    } catch (error) {
-      console.error('Auth error:', error)
-      return c.text('Internal Server Error', 500)
-    }
-  })
-
-  /**
-   * POST /api/live/unpublish
-   * nginx-rtmp unpublish callback (stream stopped)
-   */
-  .post('/unpublish', async (c) => {
-    try {
-      const body = await c.req.parseBody()
-      const streamKey = body.name as string
-
-      if (!streamKey) {
-        return c.text('OK', 200) // Don't fail on missing key
-      }
-
-      await liveService.handleUnpublish(streamKey)
-
-      return c.text('OK', 200)
-    } catch (error) {
-      console.error('Unpublish error:', error)
-      return c.text('OK', 200) // Always return 200 to nginx
-    }
-  })
-
-  /**
    * POST /api/live/:id/start
    * Start live streaming
    */
@@ -159,7 +106,7 @@ export const liveRoutes = new Hono<{ Bindings: Bindings }>()
 
   /**
    * GET /api/live/:id/watch
-   * Get HLS playback URL
+   * Get HLS playback URL from MinIO
    */
   .get('/:id/watch', async (c) => {
     const videoId = c.req.param('id')
@@ -169,8 +116,10 @@ export const liveRoutes = new Hono<{ Bindings: Bindings }>()
       throw new BadRequestError('Not a live stream')
     }
 
-    // HLS manifest URL (served by nginx-rtmp HTTP server)
-    const hlsUrl = `${process.env.HLS_SERVER_URL || 'http://localhost:8080/hls'}/${stream.streamKey}.m3u8`
+    // HLS manifest URL from MinIO processed bucket
+    const hlsUrl = stream.hlsManifestKey
+      ? `${process.env.NEXT_PUBLIC_STORAGE_URL}/videos-processed/${stream.hlsManifestKey}`
+      : null
 
     return successResponse(c, {
       videoId: stream.id,

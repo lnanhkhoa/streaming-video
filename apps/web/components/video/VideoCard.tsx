@@ -5,20 +5,28 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge'
 import type { Video } from '@repo/constants'
 import { VideoStats } from './VideoStats'
+import { env } from '@/env'
+import Image from 'next/image'
 
 interface VideoCardProps {
   video: Video
 }
 
 export function VideoCard({ video }: VideoCardProps) {
-  const thumbnailUrl = `${process.env.NEXT_PUBLIC_API_URL}/${video.thumbnailKey}`
+  const thumbnailUrl = `${env.THUMBNAILS_STORAGE_URL}/${video.thumbnailKey}`
   return (
     <Link href={`/videos/${video.id}`}>
       <Card className="hover:shadow-lg transition-shadow cursor-pointer">
         <CardHeader className="p-0">
           <div className="relative w-full aspect-video bg-gray-200 rounded-t-lg overflow-hidden">
             {video.thumbnailKey ? (
-              <img src={thumbnailUrl} alt={video.title} className="w-full h-full object-cover" />
+              <Image
+                src={thumbnailUrl}
+                alt={video.title}
+                width={100}
+                height={100}
+                className="w-full h-full object-cover"
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-400">
                 No thumbnail

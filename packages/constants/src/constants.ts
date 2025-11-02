@@ -8,11 +8,24 @@ export const HLS_VARIANTS = [
 
 export const VIDEO_RESOLUTIONS = ['1080p', '720p', '480p'] as const
 
+export const VIDEO_STATUS = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  READY: 'READY',
+  FAILED: 'FAILED',
+  LIVE: 'LIVE'
+} as const
+
 // Upload Limits
 export const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024 // 2GB
 export const MIN_FILE_SIZE = 1024 // 1KB
 
 export const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/ogg'] as const
+
+// storage buckets
+export const BUCKET_RAW = 'videos-raw'
+export const BUCKET_PROCESSED = 'videos-processed'
+export const BUCKET_THUMBNAILS = 'thumbnails'
 
 // FFmpeg Settings
 export const FFMPEG_PRESET = 'medium'

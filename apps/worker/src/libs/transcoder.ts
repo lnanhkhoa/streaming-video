@@ -3,6 +3,8 @@ import path from 'node:path'
 import fsp from 'node:fs/promises'
 import fs from 'node:fs'
 import { env } from '../env'
+import { storageService } from '../services/storage'
+import { prisma } from '@repo/database'
 
 /**
  * FFmpeg Transcoder - VOD
@@ -139,6 +141,7 @@ async function transcodeVariant(
         `-hls_segment_filename ${segmentPattern}`
       ])
       .output(playlistPath)
+      .addOption('-threads', '4') // Apply -threads option to the output
       .on('start', (cmdLine) => {
         console.log(`🎬 Transcoding ${variant.resolution}...`)
       })
@@ -242,10 +245,21 @@ export async function transcodeVideo(
     const thumbnailPath = path.join(outputDir, 'thumbnail.jpg')
     await generateThumbnail(inputPath, thumbnailPath)
 
-    // 3. Transcode to HLS variants
+    // 3. Upload thumbnail immediately and update DB
+    const thumbnailKey = await storageService.uploadThumbnail(thumbnailPath, videoId)
+    await prisma.video.update({
+      where: { id: videoId },
+      data: { thumbnailKey }
+    })
+    console.log(`✅ Thumbnail uploaded and DB updated: ${thumbnailKey}`)
+
+    // 4. Delete local thumbnail file
+    await fsp.unlink(thumbnailPath)
+
+    // 5. Transcode to HLS variants
     await transcodeToHLS({ inputPath, outputDir, videoId })
 
-    // 4. Generate master playlist
+    // 6. Generate master playlist
     await generateMasterPlaylist(outputDir, metadata)
 
     console.log(`✅ Transcoding complete for ${videoId}`)

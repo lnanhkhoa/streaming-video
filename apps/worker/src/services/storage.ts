@@ -14,6 +14,7 @@ import fs from 'node:fs'
 import fsp from 'node:fs/promises'
 import path from 'node:path'
 import { env } from '../env'
+import { BUCKET_PROCESSED, BUCKET_RAW, BUCKET_THUMBNAILS } from '@repo/constants'
 
 export interface StorageConfig {
   endpoint: string
@@ -67,8 +68,9 @@ function guessContentType(filePath: string): string {
 export class StorageService {
   private client: Client
   private buckets = {
-    raw: 'videos-raw',
-    processed: 'videos-processed'
+    raw: BUCKET_RAW,
+    processed: BUCKET_PROCESSED,
+    thumbnails: BUCKET_THUMBNAILS
   }
   private uploadTimeoutMs: number
   private downloadTimeoutMs: number
@@ -94,12 +96,29 @@ export class StorageService {
   }
 
   private async ensureBuckets(): Promise<void> {
-    for (const bucket of Object.values(this.buckets)) {
+    for (const [bucketType, bucket] of Object.entries(this.buckets)) {
       await this.withRetry(async () => {
         const exists = await this.client.bucketExists(bucket)
         if (!exists) {
           await this.client.makeBucket(bucket)
           console.log(`✅ Created bucket: ${bucket}`)
+        }
+
+        // Set processed and thumbnails buckets as public
+        if (bucketType === 'processed' || bucketType === 'thumbnails') {
+          const policy = {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: '*',
+                Action: ['s3:GetObject'],
+                Resource: [`arn:aws:s3:::${bucket}/*`]
+              }
+            ]
+          }
+          await this.client.setBucketPolicy(bucket, JSON.stringify(policy))
+          console.log(`🔓 Set ${bucket} as public`)
         }
       }, `ensureBucket:${bucket}`)
     }
@@ -151,7 +170,28 @@ export class StorageService {
       )
     }
     await this.withRetry(op, `uploadFile:${key}`)
-    console.log(`⬆️  Uploaded ${localPath} -> s3://${this.buckets.processed}/${key} (${contentType})`)
+    console.log(
+      `⬆️  Uploaded ${localPath} -> s3://${this.buckets.processed}/${key} (${contentType})`
+    )
+  }
+
+  async uploadThumbnail(localPath: string, videoId: string): Promise<string> {
+    const key = `${videoId}/thumbnail.jpg`
+    const contentType = 'image/jpeg'
+
+    const op = async () => {
+      await withTimeout(
+        this.client.fPutObject(this.buckets.thumbnails, key, localPath, {
+          'Content-Type': contentType
+        }),
+        this.uploadTimeoutMs,
+        'uploadThumbnail'
+      )
+    }
+
+    await this.withRetry(op, `uploadThumbnail:${key}`)
+    console.log(`📸 Uploaded thumbnail -> s3://${this.buckets.thumbnails}/${key}`)
+    return key
   }
 
   async uploadDirectory(localDir: string, prefix: string): Promise<string[]> {
@@ -215,7 +255,9 @@ export class StorageService {
         await this.client.removeObjects(this.buckets.processed, chunk)
       }
     }, `deleteFiles:${prefix}`)
-    console.log(`🧹 Deleted ${keys.length} object(s) with prefix ${prefix} in ${this.buckets.processed}`)
+    console.log(
+      `🧹 Deleted ${keys.length} object(s) with prefix ${prefix} in ${this.buckets.processed}`
+    )
   }
 }
 

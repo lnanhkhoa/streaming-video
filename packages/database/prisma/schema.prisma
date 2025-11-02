@@ -30,6 +30,12 @@ model Video {
   streamKey       String?        @unique  // For RTMP ingest
   isLiveNow       Boolean        @default(false)
 
+  // Transcoding progress tracking
+  transcodingProgress    Int?           // 0-100 percentage
+  transcodingStartedAt   DateTime?      // When transcoding started
+  transcodingEstimatedEnd DateTime?     // Estimated completion time
+  transcodingError       String?        // Error message if FAILED
+
   // Analytics
   viewsToday      Int            @default(0)
   viewsMonth      Int            @default(0)

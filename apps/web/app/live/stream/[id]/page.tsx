@@ -84,7 +84,7 @@ export default function StreamHostPage() {
     <main className="container mx-auto p-8">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Host Live Stream</h1>
-        <p className="text-gray-600">{streamData.title}</p>
+        <p className="text-gray-600">{streamData?.video?.title || 'Live Stream'}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

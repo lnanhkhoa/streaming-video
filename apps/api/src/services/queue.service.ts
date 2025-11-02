@@ -125,7 +125,7 @@ class QueueService {
    * @returns Success boolean
    */
   async publishTranscodeJob(job: TranscodeJob): Promise<boolean> {
-    console.log("🚀 ~ QueueService ~ publishTranscodeJob ~ job:", job)
+    console.log('🚀 ~ QueueService ~ publishTranscodeJob ~ job:', job)
     // Validate before publishing
     try {
       validateTranscodeJob(job)
