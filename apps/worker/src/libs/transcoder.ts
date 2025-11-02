@@ -2,6 +2,7 @@ import ffmpeg from 'fluent-ffmpeg'
 import path from 'node:path'
 import fsp from 'node:fs/promises'
 import fs from 'node:fs'
+import os from 'node:os'
 import { env } from '../env'
 import { storageService } from '../services/storage'
 import { prisma } from '@repo/database'
@@ -44,6 +45,8 @@ const HLS_VARIANTS: HLSVariant[] = [
 
 const FFMPEG_PRESET = env.FFMPEG_PRESET
 const FFMPEG_CRF = env.FFMPEG_CRF
+
+const MAX_THREADS = 6
 
 /**
  * Extract video metadata using ffprobe
@@ -108,9 +111,10 @@ export async function generateThumbnail(inputPath: string, outputPath: string): 
 }
 
 /**
- * Transcode single variant to HLS
+ * Transcode single variant to HLS with hardware encoding
+ * Apple Silicon: Uses h264_videotoolbox for hardware-accelerated encoding
  */
-async function transcodeVariant(
+async function transcodeVariantHW(
   inputPath: string,
   outputDir: string,
   variant: HLSVariant
@@ -123,10 +127,11 @@ async function transcodeVariant(
 
   return new Promise((resolve, reject) => {
     const cmd = ffmpeg(inputPath)
+      // Input options: hardware-accelerated decoding
+      .inputOptions(['-hwaccel', 'videotoolbox'])
       .outputOptions([
-        '-c:v libx264',
-        `-preset ${FFMPEG_PRESET}`,
-        `-crf ${FFMPEG_CRF}`,
+        // Hardware encoding for Apple Silicon
+        '-c:v h264_videotoolbox',
         `-b:v ${variant.bitrate}k`,
         `-maxrate ${Math.floor(variant.bitrate * 1.2)}k`,
         `-bufsize ${variant.bitrate * 2}k`,
@@ -141,9 +146,8 @@ async function transcodeVariant(
         `-hls_segment_filename ${segmentPattern}`
       ])
       .output(playlistPath)
-      .addOption('-threads', '4') // Apply -threads option to the output
       .on('start', (cmdLine) => {
-        console.log(`🎬 Transcoding ${variant.resolution}...`)
+        console.log(`🎬 Transcoding ${variant.resolution} (hardware-encoded)...`)
       })
       .on('progress', (progress) => {
         if (progress.percent) {
@@ -185,9 +189,9 @@ export async function transcodeToHLS(options: TranscodeOptions): Promise<void> {
 
   console.log(`🎥 Transcoding to ${applicableVariants.map((v) => v.resolution).join(', ')}`)
 
-  // Transcode variants sequentially to avoid resource exhaustion
+  // Transcode variants sequentially with hardware encoding
   for (const variant of applicableVariants) {
-    await transcodeVariant(inputPath, outputDir, variant)
+    await transcodeVariantHW(inputPath, outputDir, variant)
   }
 
   console.log('✅ All variants transcoded')

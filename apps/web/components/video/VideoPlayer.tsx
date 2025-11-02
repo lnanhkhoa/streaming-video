@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useVideoPlayer } from '@/hooks/useVideoPlayer'
+import Player from 'next-video/player'
 import { useViewTracking } from '@/hooks/useViewTracking'
 import { Badge } from '@/components/ui/badge'
 
@@ -14,13 +14,6 @@ interface VideoPlayerProps {
 export function VideoPlayer({ videoId, manifestUrl, isLive }: VideoPlayerProps) {
   const [error, setError] = useState<string | null>(null)
   const { trackView } = useViewTracking(videoId)
-
-  const { videoRef, handlePlay } = useVideoPlayer({
-    manifestUrl,
-    isLive,
-    onPlay: trackView,
-    onError: (err) => setError(err.message)
-  })
 
   return (
     <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden">
@@ -37,7 +30,13 @@ export function VideoPlayer({ videoId, manifestUrl, isLive }: VideoPlayerProps) 
         </div>
       )}
 
-      <video ref={videoRef} controls className="w-full h-full" onPlay={handlePlay} playsInline />
+      <Player
+        src={manifestUrl}
+        onPlay={trackView}
+        onError={() => setError('Failed to load video')}
+        controls
+        playsInline
+      />
     </div>
   )
 }

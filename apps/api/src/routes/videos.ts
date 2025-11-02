@@ -41,7 +41,13 @@ export const videoRoutes = app
     const result = await videoService.getVideoById(id)
     if (!result) throw new NotFoundError('Video', id)
 
-    return successResponse(c, result)
+    // Flatten response: merge video and variants into single Video object
+    return successResponse(c, {
+      video: {
+        ...result.video,
+        variants: result.variants
+      }
+    })
   })
 
   /**

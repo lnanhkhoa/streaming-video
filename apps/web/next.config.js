@@ -1,3 +1,5 @@
+import { withNextVideo } from 'next-video/process'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -8,12 +10,13 @@ const nextConfig = {
         protocol: 'http',
         hostname: '::',
         port: '9000',
-        pathname: "/**",
+        pathname: '/**',
       },
     ],
     // Allow unoptimized images for localhost (development)
+    // eslint-disable-next-line no-undef
     unoptimized: process.env.NODE_ENV === 'development',
   },
-};
+}
 
-export default nextConfig;
+export default withNextVideo(nextConfig)

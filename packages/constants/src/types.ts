@@ -22,6 +22,8 @@ export interface Video {
   viewsTotal: number
   createdAt: Date
   updatedAt: Date
+  variants?: VideoVariant[]
+  playbackUrl?: string
 }
 
 // Video Variant

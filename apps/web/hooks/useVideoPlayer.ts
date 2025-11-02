@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import Hls from 'hls.js'
+import shaka from 'shaka-player'
 
 interface UseVideoPlayerOptions {
   manifestUrl: string
@@ -12,56 +12,58 @@ interface UseVideoPlayerOptions {
 
 export function useVideoPlayer({ manifestUrl, isLive, onPlay, onError }: UseVideoPlayerOptions) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const hlsRef = useRef<Hls | null>(null)
+  const playerRef = useRef<shaka.Player | null>(null)
 
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
 
-    // Clean up previous instance
-    if (hlsRef.current) {
-      hlsRef.current.destroy()
-      hlsRef.current = null
-    }
-
-    if (Hls.isSupported()) {
-      const hls = new Hls({
-        // Low latency config for live streams
-        liveSyncDurationCount: isLive ? 3 : undefined,
-        liveMaxLatencyDurationCount: isLive ? 5 : undefined,
-        enableWorker: true,
-        lowLatencyMode: isLive
-      })
-
-      hls.loadSource(manifestUrl)
-      hls.attachMedia(video)
-
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        console.log('HLS manifest parsed')
-      })
-
-      hls.on(Hls.Events.ERROR, (event, data) => {
-        if (data.fatal) {
-          console.error('Fatal HLS error:', data)
-          onError?.(new Error(`HLS error: ${data.type} - ${data.details}`))
+    // Initialize Shaka Player
+    const initPlayer = async () => {
+      try {
+        // Clean up previous instance
+        if (playerRef.current) {
+          await playerRef.current.destroy()
+          playerRef.current = null
         }
-      })
 
-      hlsRef.current = hls
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      // Native HLS support (Safari)
-      video.src = manifestUrl
-      video.addEventListener('error', () => {
-        onError?.(new Error('Video playback error'))
-      })
-    } else {
-      onError?.(new Error('HLS not supported in this browser'))
+        // Create new player
+        const player = new shaka.Player(video)
+
+        // Configure player
+        player.configure({
+          streaming: {
+            bufferingGoal: isLive ? 2 : 10,
+            rebufferingGoal: isLive ? 2 : 8,
+            lowLatencyMode: isLive
+          }
+        })
+
+        // Listen for errors
+        player.addEventListener('error', (event: Event) => {
+          const errorEvent = event as shaka.util.FakeEvent
+          const error = errorEvent.detail as shaka.util.Error
+          console.error('Shaka Player error:', error)
+          onError?.(new Error(`Playback error: ${error.message}`))
+        })
+
+        // Load manifest
+        await player.load(manifestUrl)
+        console.log('Manifest loaded successfully')
+
+        playerRef.current = player
+      } catch (error) {
+        console.error('Failed to initialize player:', error)
+        onError?.(error instanceof Error ? error : new Error('Failed to initialize player'))
+      }
     }
+
+    initPlayer()
 
     return () => {
-      if (hlsRef.current) {
-        hlsRef.current.destroy()
-        hlsRef.current = null
+      if (playerRef.current) {
+        playerRef.current.destroy()
+        playerRef.current = null
       }
     }
   }, [manifestUrl, isLive, onError])
