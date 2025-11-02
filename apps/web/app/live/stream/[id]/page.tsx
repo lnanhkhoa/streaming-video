@@ -8,29 +8,20 @@ import { CameraStream } from '@/components/live/CameraStream'
 import { StreamControls } from '@/components/live/StreamControls'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { useParams } from 'next/navigation'
 
-interface StreamHostPageProps {
-  params: { id: string }
-}
-
-export default function StreamHostPage({ params }: StreamHostPageProps) {
+export default function StreamHostPage() {
+  const params = useParams()
   const router = useRouter()
-  const [videoId] = useState(params.id)
+  const videoId = params.id as string
   const [error, setError] = useState<string | null>(null)
 
   const { data: streamData, isLoading: isLoadingStream, error: streamError } = useVideo(videoId)
   const { mutateAsync: startStream, isPending: isStarting } = useStartLiveStream()
   const { mutateAsync: stopStream, isPending: isStopping } = useStopLiveStream()
 
-  const {
-    stream,
-    isStreaming,
-    isCameraOn,
-    isMicOn,
-    toggleCamera,
-    toggleMic,
-    setIsStreaming,
-  } = useLiveStream()
+  const { stream, isStreaming, isCameraOn, isMicOn, toggleCamera, toggleMic, setIsStreaming } =
+    useLiveStream()
 
   const handleStartStream = async () => {
     if (!stream) {
@@ -123,9 +114,7 @@ export default function StreamHostPage({ params }: StreamHostPageProps) {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Video ID:</span>
-                <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                  {videoId}
-                </code>
+                <code className="text-xs bg-gray-100 px-2 py-1 rounded">{videoId}</code>
               </div>
             </div>
           </Card>

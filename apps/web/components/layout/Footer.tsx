@@ -9,23 +9,23 @@ export function Footer() {
     product: [
       { label: 'Videos', href: '/' },
       { label: 'Live Streams', href: '/live' },
-      { label: 'Upload', href: '/videos/upload' },
+      { label: 'Upload', href: '/videos/upload' }
     ],
     company: [
       { label: 'About', href: '/about' },
       { label: 'Blog', href: '/blog' },
-      { label: 'Contact', href: '/contact' },
+      { label: 'Contact', href: '/contact' }
     ],
     legal: [
       { label: 'Privacy Policy', href: '/privacy' },
       { label: 'Terms of Service', href: '/terms' },
-      { label: 'Cookie Policy', href: '/cookies' },
-    ],
+      { label: 'Cookie Policy', href: '/cookies' }
+    ]
   }
 
   const socialLinks = [
     { icon: Github, href: 'https://github.com', label: 'GitHub' },
-    { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' },
+    { icon: Twitter, href: 'https://twitter.com', label: 'Twitter' }
   ]
 
   return (
@@ -36,7 +36,8 @@ export function Footer() {
           <div>
             <Logo size="md" />
             <p className="mt-4 text-sm text-gray-600">
-              Stream and share your videos with the world. Live streaming and video hosting made simple.
+              Stream and share your videos with the world. Live streaming and video hosting made
+              simple.
             </p>
             <div className="flex gap-4 mt-4">
               {socialLinks.map((social) => {

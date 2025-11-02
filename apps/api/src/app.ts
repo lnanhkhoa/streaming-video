@@ -7,20 +7,22 @@ import uploadRoutes from './routes/upload'
 import analyticsRoutes from './routes/analytics'
 import liveRoutes from './routes/live'
 
-const app = new Hono()
+type AppBindings = {
+  Bindings: Record<string, unknown>
+}
 
-// Middleware
-app.use('*', logger())
-app.use('*', cors())
-app.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }))
+// Create base app with middleware
+const baseApp = new Hono<AppBindings>()
+baseApp.use('*', logger())
+baseApp.use('*', cors())
+baseApp.get('/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }))
 
-// Routes - properly typed for RPC
-app.route('/api/videos', videoRoutes)
-app.route('/api/upload', uploadRoutes)
-app.route('/api/analytics', analyticsRoutes)
-app.route('/api/live', liveRoutes)
+// Create app with routes and error handler
+const app = baseApp
+  .route('/api/videos', videoRoutes)
+  .route('/api/upload', uploadRoutes)
+  .route('/api/analytics', analyticsRoutes)
+  .route('/api/live', liveRoutes)
+  .onError(errorHandler)
 
-// Global error handler (must be last)
-app.onError(errorHandler)
-
-export default app
+export { app }

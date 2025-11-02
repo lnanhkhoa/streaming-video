@@ -1,7 +1,7 @@
 'use client'
 
 import { useVideos } from '@/lib/hooks'
-import { VideoList } from '@/components/video/VideoList'
+import { VideoList } from 'components/video/VideoList'
 
 export default function HomePage() {
   const { data: videos = [], isLoading, error } = useVideos()

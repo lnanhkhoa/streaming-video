@@ -65,7 +65,7 @@ export function UploadForm() {
       const { videoId, uploadUrl, key } = await getPresignedUrl({
         fileName: selectedFile.name,
         fileSize: selectedFile.size,
-        contentType: selectedFile.type,
+        contentType: selectedFile.type
       })
 
       // 2. Upload file directly to MinIO
@@ -89,8 +89,8 @@ export function UploadForm() {
               data: {
                 key,
                 title: title.trim(),
-                description: description.trim() || undefined,
-              },
+                description: description.trim() || undefined
+              }
             })
 
             setStatus('completed')
@@ -211,11 +211,7 @@ export function UploadForm() {
                 Your video is being processed. This may take a few minutes.
               </p>
             )}
-            {isCompleted && (
-              <p className="text-sm text-green-600">
-                Redirecting to video page...
-              </p>
-            )}
+            {isCompleted && <p className="text-sm text-green-600">Redirecting to video page...</p>}
           </div>
         )}
 

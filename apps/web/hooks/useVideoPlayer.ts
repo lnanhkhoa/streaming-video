@@ -10,12 +10,7 @@ interface UseVideoPlayerOptions {
   onError?: (error: Error) => void
 }
 
-export function useVideoPlayer({
-  manifestUrl,
-  isLive,
-  onPlay,
-  onError,
-}: UseVideoPlayerOptions) {
+export function useVideoPlayer({ manifestUrl, isLive, onPlay, onError }: UseVideoPlayerOptions) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const hlsRef = useRef<Hls | null>(null)
 
@@ -35,7 +30,7 @@ export function useVideoPlayer({
         liveSyncDurationCount: isLive ? 3 : undefined,
         liveMaxLatencyDurationCount: isLive ? 5 : undefined,
         enableWorker: true,
-        lowLatencyMode: isLive,
+        lowLatencyMode: isLive
       })
 
       hls.loadSource(manifestUrl)

@@ -25,7 +25,7 @@ export default function CreateLivePage() {
 
       const stream = await createStream({
         title: title.trim(),
-        description: description.trim() || undefined,
+        description: description.trim() || undefined
       })
 
       // Redirect to streaming page
@@ -40,17 +40,13 @@ export default function CreateLivePage() {
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Create Live Stream</h1>
-          <p className="text-gray-600">
-            Set up your live stream and start broadcasting
-          </p>
+          <p className="text-gray-600">Set up your live stream and start broadcasting</p>
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle>Stream Details</CardTitle>
-            <CardDescription>
-              Enter information about your live stream
-            </CardDescription>
+            <CardDescription>Enter information about your live stream</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">

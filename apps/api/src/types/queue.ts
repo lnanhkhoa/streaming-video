@@ -3,7 +3,7 @@ import { z } from 'zod'
 // Transcode job schema
 export const transcodeJobSchema = z.object({
   type: z.literal('transcode').optional(), // Optional for backward compatibility
-  videoId: z.string().cuid(),
+  videoId: z.string(),
   inputKey: z.string().min(1)
 })
 
@@ -12,7 +12,7 @@ export type TranscodeJob = z.infer<typeof transcodeJobSchema>
 // Start live stream job schema
 export const startLiveStreamJobSchema = z.object({
   type: z.literal('start-live-stream'),
-  videoId: z.string().cuid(),
+  videoId: z.string(),
   streamKey: z.string().min(1),
   inputSource: z.string().min(1) // RTMP URL, file path, or HTTP stream URL
 })
@@ -22,7 +22,7 @@ export type StartLiveStreamJob = z.infer<typeof startLiveStreamJobSchema>
 // Stop live stream job schema
 export const stopLiveStreamJobSchema = z.object({
   type: z.literal('stop-live-stream'),
-  videoId: z.string().cuid(),
+  videoId: z.string(),
   convertToVOD: z.boolean().optional()
 })
 

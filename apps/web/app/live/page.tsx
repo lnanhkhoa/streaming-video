@@ -45,9 +45,7 @@ export default function LivePage() {
           <h1 className="text-4xl font-bold">Live Now</h1>
           <div className="inline-block w-3 h-3 bg-red-600 rounded-full animate-pulse" />
         </div>
-        <p className="text-gray-600">
-          Watch live streams happening right now
-        </p>
+        <p className="text-gray-600">Watch live streams happening right now</p>
       </div>
 
       {liveVideos.length === 0 ? (
@@ -67,9 +65,7 @@ export default function LivePage() {
               />
             </svg>
           </div>
-          <h2 className="text-2xl font-semibold text-gray-700 mb-2">
-            No Live Streams
-          </h2>
+          <h2 className="text-2xl font-semibold text-gray-700 mb-2">No Live Streams</h2>
           <p className="text-gray-600 mb-6">
             There are no live streams at the moment. Check back later!
           </p>

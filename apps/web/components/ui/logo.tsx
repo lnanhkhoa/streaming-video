@@ -10,7 +10,7 @@ export function Logo({ size = 'md', showText = true }: LogoProps) {
   const sizeClasses = {
     sm: { icon: 'w-6 h-6', text: 'text-lg' },
     md: { icon: 'w-8 h-8', text: 'text-xl' },
-    lg: { icon: 'w-10 h-10', text: 'text-2xl' },
+    lg: { icon: 'w-10 h-10', text: 'text-2xl' }
   }
 
   return (
@@ -19,7 +19,9 @@ export function Logo({ size = 'md', showText = true }: LogoProps) {
         <Video className={`${sizeClasses[size].icon} text-white`} />
       </div>
       {showText && (
-        <span className={`font-bold ${sizeClasses[size].text} bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent`}>
+        <span
+          className={`font-bold ${sizeClasses[size].text} bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent`}
+        >
           StreamVid
         </span>
       )}

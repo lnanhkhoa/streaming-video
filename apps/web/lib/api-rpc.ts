@@ -18,14 +18,10 @@ export type {
   VideoVisibility,
   CreateLiveStreamRequest,
   PresignUploadRequest,
-  VideoStatsResponse,
+  VideoStatsResponse
 } from '@repo/constants'
 
-import type {
-  Video,
-  VideoStatsResponse,
-  CreateLiveStreamRequest,
-} from '@repo/constants'
+import type { Video, VideoStatsResponse, CreateLiveStreamRequest } from '@repo/constants'
 
 /**
  * Helper to unwrap API responses from { success: true, data: T } to T
@@ -54,8 +50,8 @@ export const videoAPI = {
     visibility?: string
     liveOnly?: boolean
   }): Promise<{ videos: Video[]; total: number; hasMore: boolean }> => {
-    const res = await (rpcClient as any).api.videos.list.$get({
-      query: params as any,
+    const res = await (rpcClient as any).api.videos.$get({
+      query: params as any
     })
     return unwrapResponse(res)
   },
@@ -63,10 +59,8 @@ export const videoAPI = {
   /**
    * Get video by ID with variants and playback URLs
    */
-  getVideo: async (id: string): Promise<Video> => {
-    const res = await (rpcClient as any).api.videos[':id'].$get({
-      param: { id },
-    })
+  getVideo: async (id: string): Promise<{ video: Video }> => {
+    const res = await (rpcClient as any).api.videos[':id'].$get({ param: { id } })
     return unwrapResponse(res)
   },
 
@@ -83,7 +77,7 @@ export const videoAPI = {
   ): Promise<{ video: Video }> => {
     const res = await (rpcClient as any).api.videos[':id'].$patch({
       param: { id },
-      json: data,
+      json: data
     })
     return unwrapResponse(res)
   },
@@ -93,10 +87,10 @@ export const videoAPI = {
    */
   deleteVideo: async (id: string): Promise<{ message: string }> => {
     const res = await (rpcClient as any).api.videos[':id'].$delete({
-      param: { id },
+      param: { id }
     })
     return unwrapResponse(res)
-  },
+  }
 }
 
 // Analytics endpoints
@@ -106,7 +100,7 @@ export const analyticsAPI = {
    */
   trackView: async (id: string): Promise<{ message: string }> => {
     const res = await (rpcClient as any).api.analytics.view[':id'].$post({
-      param: { id },
+      param: { id }
     })
     return unwrapResponse(res)
   },
@@ -115,11 +109,9 @@ export const analyticsAPI = {
    * Get video statistics
    */
   getStats: async (id: string): Promise<VideoStatsResponse> => {
-    const res = await (rpcClient as any).api.analytics.stats[':id'].$get({
-      param: { id },
-    })
+    const res = await (rpcClient as any).api.analytics.stats[':id'].$get({ param: { id } })
     return unwrapResponse(res)
-  },
+  }
 }
 
 // Live streaming endpoints
@@ -127,13 +119,15 @@ export const liveAPI = {
   /**
    * Create a new live stream
    */
-  createLiveStream: async (data: CreateLiveStreamRequest): Promise<{
+  createLiveStream: async (
+    data: CreateLiveStreamRequest
+  ): Promise<{
     videoId: string
     streamKey: string
     rtmpUrl: string
   }> => {
     const res = await (rpcClient as any).api.live.create.$post({
-      json: data,
+      json: data
     })
     return unwrapResponse(res)
   },
@@ -141,14 +135,16 @@ export const liveAPI = {
   /**
    * Start a live stream
    */
-  startLiveStream: async (videoId: string): Promise<{
+  startLiveStream: async (
+    videoId: string
+  ): Promise<{
     message: string
     videoId: string
     status: string
   }> => {
     const res = await (rpcClient as any).api.live[':id'].start.$post({
       param: { id: videoId },
-      json: { streamKey: '' }, // Will be validated by API
+      json: { streamKey: '' } // Will be validated by API
     })
     return unwrapResponse(res)
   },
@@ -156,16 +152,18 @@ export const liveAPI = {
   /**
    * Stop a live stream
    */
-  stopLiveStream: async (videoId: string): Promise<{
+  stopLiveStream: async (
+    videoId: string
+  ): Promise<{
     message: string
     status: string
   }> => {
     const res = await (rpcClient as any).api.live[':id'].stop.$post({
       param: { id: videoId },
-      json: {},
+      json: {}
     })
     return unwrapResponse(res)
-  },
+  }
 }
 
 // Upload endpoints
@@ -184,7 +182,7 @@ export const uploadAPI = {
     expiresIn: number
   }> => {
     const res = await (rpcClient as any).api.upload.presign.$post({
-      json: data,
+      json: data
     })
     return unwrapResponse(res)
   },
@@ -202,8 +200,8 @@ export const uploadAPI = {
   ): Promise<{ video: Video }> => {
     const res = await (rpcClient as any).api.upload[':id'].complete.$post({
       param: { id: videoId },
-      json: data,
+      json: data
     })
     return unwrapResponse(res)
-  },
+  }
 }

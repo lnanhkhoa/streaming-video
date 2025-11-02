@@ -11,18 +11,21 @@ This directory contains detailed feature-based implementation plans for the Phas
 ## Features
 
 ### Feature 1: Foundation & Setup
+
 **File**: `feature-1-foundation-setup.md`
 **Time**: 2-3 hours
 **Priority**: P0 (Must complete first)
 **Dependencies**: None
 
 Setup project foundation including:
+
 - Install dependencies (HLS.js, React Query, Zustand, Lucide)
 - Setup Shadcn/UI components
 - Create API client with TypeScript types
 - Configure environment variables
 
 **Deliverables**:
+
 - ✅ All dependencies installed
 - ✅ Shadcn UI components ready
 - ✅ Type-safe API client
@@ -31,18 +34,21 @@ Setup project foundation including:
 ---
 
 ### Feature 2: Video Browsing & Playback
+
 **File**: `feature-2-video-browsing-playback.md`
 **Time**: 4-5 hours
 **Priority**: P0 (Core feature)
 **Dependencies**: Feature 1
 
 Implement core video functionality:
+
 - Home page with video grid
 - HLS video player (VOD + Live)
 - Video cards with thumbnails
 - View tracking and statistics
 
 **Deliverables**:
+
 - ✅ Browse all videos
 - ✅ Watch videos with HLS
 - ✅ View counts tracked
@@ -51,12 +57,14 @@ Implement core video functionality:
 ---
 
 ### Feature 3: Video Upload
+
 **File**: `feature-3-video-upload.md`
 **Time**: 3-4 hours
 **Priority**: P1 (High priority)
 **Dependencies**: Feature 1
 
 Implement video upload flow:
+
 - Upload page with form
 - File validation (type, size)
 - Direct upload to MinIO via presigned URL
@@ -64,6 +72,7 @@ Implement video upload flow:
 - Processing status
 
 **Deliverables**:
+
 - ✅ Upload videos up to 500MB
 - ✅ Real-time progress
 - ✅ Direct-to-storage upload
@@ -72,18 +81,21 @@ Implement video upload flow:
 ---
 
 ### Feature 4: Live Streaming - Viewing
+
 **File**: `feature-4-live-streaming-viewing.md`
 **Time**: 2-3 hours
 **Priority**: P1 (High priority)
 **Dependencies**: Feature 2
 
 Implement live stream viewing:
+
 - Live streams browse page
 - Live indicator badges
 - Low latency HLS playback
 - Real-time status updates
 
 **Deliverables**:
+
 - ✅ Browse active streams
 - ✅ Watch live with low latency
 - ✅ Clear live indicators
@@ -92,12 +104,14 @@ Implement live stream viewing:
 ---
 
 ### Feature 5: Live Streaming - Broadcasting
+
 **File**: `feature-5-live-streaming-broadcasting.md`
 **Time**: 5-6 hours
 **Priority**: P1 (High priority)
 **Dependencies**: Feature 1, Feature 4
 
 Implement stream broadcasting:
+
 - Create live stream page
 - Camera/mic capture
 - Stream preview (mirrored)
@@ -105,6 +119,7 @@ Implement stream broadcasting:
 - Host streaming interface
 
 **Deliverables**:
+
 - ✅ Create live streams
 - ✅ Capture camera/mic
 - ✅ Control stream
@@ -113,12 +128,14 @@ Implement stream broadcasting:
 ---
 
 ### Feature 6: Layout & Navigation
+
 **File**: `feature-6-layout-navigation.md`
 **Time**: 2-3 hours
 **Priority**: P0 (Can be done in parallel)
 **Dependencies**: Feature 1
 
 Implement app-wide layout:
+
 - Navigation header (sticky)
 - Footer with links
 - Logo component
@@ -126,6 +143,7 @@ Implement app-wide layout:
 - Global styles
 
 **Deliverables**:
+
 - ✅ Consistent navigation
 - ✅ Responsive layout
 - ✅ Brand identity
@@ -154,15 +172,18 @@ Implement app-wide layout:
 ### Alternative Parallel Approach
 
 **Day 1 (6-8 hours)**:
+
 - Feature 1: Foundation & Setup
 - Feature 6: Layout & Navigation
 - Start Feature 2: Video Browsing
 
 **Day 2 (6-8 hours)**:
+
 - Complete Feature 2: Video Browsing & Playback
 - Feature 3: Video Upload
 
 **Day 3 (6-8 hours)**:
+
 - Feature 4: Live Streaming - Viewing
 - Feature 5: Live Streaming - Broadcasting
 
@@ -217,6 +238,7 @@ apps/web/
 ## Testing Strategy
 
 Each feature includes:
+
 1. **Unit Tests**: Component-level testing
 2. **Integration Tests**: API interaction testing
 3. **E2E Tests**: User flow testing
@@ -248,6 +270,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 After completing all features:
 
 ### Functional Requirements
+
 - ✅ Users can browse all videos
 - ✅ Users can watch videos (HLS playback)
 - ✅ Users can upload videos (up to 500MB)
@@ -257,6 +280,7 @@ After completing all features:
 - ✅ Consistent navigation across app
 
 ### Technical Requirements
+
 - ✅ TypeScript compilation passes
 - ✅ No console errors
 - ✅ Responsive on all devices
@@ -265,6 +289,7 @@ After completing all features:
 - ✅ SEO-friendly (metadata, SSR)
 
 ### User Experience
+
 - ✅ Loading states for async operations
 - ✅ Error handling with user-friendly messages
 - ✅ Progress indicators for uploads/streaming
@@ -276,6 +301,7 @@ After completing all features:
 ## Known Limitations & Future Enhancements
 
 ### Current Limitations
+
 1. **WebRTC not fully implemented**: Streaming calls API but doesn't establish actual connection
 2. **No RTMP streaming**: Could add for OBS/external tools
 3. **No real-time viewer count**: Could add via WebSocket
@@ -283,6 +309,7 @@ After completing all features:
 5. **iOS WebRTC limitations**: Mobile Safari has limited support
 
 ### Future Enhancements
+
 1. **Authentication**: User login, profiles, subscriptions
 2. **Search**: Full-text search for videos
 3. **Recommendations**: AI-powered video recommendations
@@ -299,18 +326,22 @@ After completing all features:
 ## Resources
 
 ### Documentation
+
 - [Next.js 14 Docs](https://nextjs.org/docs)
 - [HLS.js Documentation](https://github.com/video-dev/hls.js)
 - [Shadcn/UI Components](https://ui.shadcn.com)
 - [React Query Docs](https://tanstack.com/query/latest)
 
 ### API Endpoints
+
 Reference `apps/api/src/routes/` for available endpoints:
+
 - `/api/videos/*` - Video management
 - `/api/upload/*` - Upload handling
 - `/api/live/*` - Live streaming
 
 ### Main Plan
+
 See `../phase6-frontend.md` for the original overview.
 
 ---
@@ -318,6 +349,7 @@ See `../phase6-frontend.md` for the original overview.
 ## Questions or Issues?
 
 If you encounter issues during implementation:
+
 1. Check API is running (`localhost:3001`)
 2. Verify environment variables set
 3. Review feature plan testing section

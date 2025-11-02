@@ -5,6 +5,6 @@
  * Import this in the web app instead of importing from app.ts directly.
  */
 
-import type { app } from '../app'
+import { app } from '../app'
 
 export type AppType = typeof app

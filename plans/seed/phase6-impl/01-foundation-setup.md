@@ -30,6 +30,7 @@ bun add hls.js lucide-react @tanstack/react-query zustand
 ```
 
 **Dependencies**:
+
 - `hls.js`: HLS video playback
 - `lucide-react`: Icon library
 - `@tanstack/react-query`: Data fetching & caching
@@ -56,6 +57,7 @@ bunx shadcn@latest add progress
 ```
 
 **Generates**:
+
 - `components/ui/button.tsx`
 - `components/ui/card.tsx`
 - `components/ui/input.tsx`
@@ -97,16 +99,13 @@ export interface ViewStats {
   viewsTotal: number
 }
 
-async function apiRequest<T>(
-  path: string,
-  options?: RequestInit,
-): Promise<T> {
+async function apiRequest<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...options?.headers,
-    },
+      ...options?.headers
+    }
   })
 
   if (!res.ok) {
@@ -125,7 +124,7 @@ export const videoAPI = {
   },
   getVideo: (id: string) => apiRequest<Video>(`/api/videos/${id}`),
   getVideoStats: (id: string) => apiRequest<ViewStats>(`/api/videos/${id}/stats`),
-  trackView: (id: string) => apiRequest(`/api/videos/${id}/view`, { method: 'POST' }),
+  trackView: (id: string) => apiRequest(`/api/videos/${id}/view`, { method: 'POST' })
 }
 
 // Live streaming endpoints
@@ -133,12 +132,11 @@ export const liveAPI = {
   createLiveStream: (data: { title: string; description?: string }) =>
     apiRequest<LiveStream>('/api/live/create', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     }),
   startLiveStream: (videoId: string) =>
     apiRequest(`/api/live/${videoId}/start`, { method: 'POST' }),
-  stopLiveStream: (videoId: string) =>
-    apiRequest(`/api/live/${videoId}/stop`, { method: 'POST' }),
+  stopLiveStream: (videoId: string) => apiRequest(`/api/live/${videoId}/stop`, { method: 'POST' })
 }
 
 // Upload endpoints
@@ -146,13 +144,13 @@ export const uploadAPI = {
   getUploadUrl: (filename: string) =>
     apiRequest<{ uploadUrl: string; key: string }>('/api/upload/url', {
       method: 'POST',
-      body: JSON.stringify({ filename }),
+      body: JSON.stringify({ filename })
     }),
   completeUpload: (data: { key: string; title: string; description?: string }) =>
     apiRequest<Video>('/api/upload/complete', {
       method: 'POST',
-      body: JSON.stringify(data),
-    }),
+      body: JSON.stringify(data)
+    })
 }
 ```
 
@@ -171,7 +169,7 @@ export const queryKeys = {
   video: (id: string) => [...queryKeys.videos, id] as const,
   videoStats: (id: string) => [...queryKeys.videos, id, 'stats'] as const,
   live: ['live'] as const,
-  upload: ['upload'] as const,
+  upload: ['upload'] as const
 }
 
 // Video queries
@@ -179,7 +177,7 @@ export function useVideos(liveOnly?: boolean) {
   return useQuery({
     queryKey: queryKeys.videoList(liveOnly),
     queryFn: () => videoAPI.listVideos(liveOnly),
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 30 * 1000 // 30 seconds
   })
 }
 
@@ -187,7 +185,7 @@ export function useVideo(id: string) {
   return useQuery({
     queryKey: queryKeys.video(id),
     queryFn: () => videoAPI.getVideo(id),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: 1 * 60 * 1000 // 1 minute
   })
 }
 
@@ -195,7 +193,7 @@ export function useVideoStats(id: string) {
   return useQuery({
     queryKey: queryKeys.videoStats(id),
     queryFn: () => videoAPI.getVideoStats(id),
-    staleTime: 10 * 1000, // 10 seconds
+    staleTime: 10 * 1000 // 10 seconds
   })
 }
 
@@ -205,7 +203,7 @@ export function useTrackView() {
     mutationFn: (videoId: string) => videoAPI.trackView(videoId),
     onSuccess: (_, videoId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.videoStats(videoId) })
-    },
+    }
   })
 }
 
@@ -213,11 +211,10 @@ export function useTrackView() {
 export function useCreateLiveStream() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: { title: string; description?: string }) =>
-      liveAPI.createLiveStream(data),
+    mutationFn: (data: { title: string; description?: string }) => liveAPI.createLiveStream(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.videos })
-    },
+    }
   })
 }
 
@@ -227,7 +224,7 @@ export function useStartLiveStream() {
     mutationFn: (videoId: string) => liveAPI.startLiveStream(videoId),
     onSuccess: (_, videoId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.video(videoId) })
-    },
+    }
   })
 }
 
@@ -237,14 +234,14 @@ export function useStopLiveStream() {
     mutationFn: (videoId: string) => liveAPI.stopLiveStream(videoId),
     onSuccess: (_, videoId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.video(videoId) })
-    },
+    }
   })
 }
 
 // Upload mutations
 export function useGetUploadUrl() {
   return useMutation({
-    mutationFn: (filename: string) => uploadAPI.getUploadUrl(filename),
+    mutationFn: (filename: string) => uploadAPI.getUploadUrl(filename)
   })
 }
 
@@ -255,7 +252,7 @@ export function useCompleteUpload() {
       uploadAPI.completeUpload(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.videos })
-    },
+    }
   })
 }
 ```
@@ -369,6 +366,7 @@ Visit `http://localhost:3000/test` to verify hooks work.
 ### 3. Verify Shadcn Components
 
 Check files exist:
+
 ```bash
 ls components/ui/
 # Should show: button.tsx, card.tsx, input.tsx, badge.tsx, progress.tsx
@@ -407,6 +405,7 @@ Should compile without errors.
 ## Next Steps
 
 After completion, proceed to:
+
 - **Feature 2**: Video Browsing & Playback
 - **Feature 6**: Layout & Navigation (can be done in parallel)
 

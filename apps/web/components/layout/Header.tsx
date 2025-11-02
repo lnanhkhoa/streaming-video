@@ -18,12 +18,18 @@ export function Header() {
 
   const navItems = [
     { href: '/', label: 'Videos', icon: Video },
-    { href: '/live', label: 'Live', icon: Radio },
+    { href: '/live', label: 'Live', icon: Radio }
   ]
 
   const actionButtons = [
     { href: '/videos/upload', label: 'Upload', icon: Upload, variant: 'outline' as const },
-    { href: '/live/create', label: 'Go Live', icon: Radio, variant: 'default' as const, highlight: true },
+    {
+      href: '/live/create',
+      label: 'Go Live',
+      icon: Radio,
+      variant: 'default' as const,
+      highlight: true
+    }
   ]
 
   return (

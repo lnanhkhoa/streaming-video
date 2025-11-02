@@ -10,7 +10,7 @@ export const queryKeys = {
   video: (id: string) => [...queryKeys.videos, id] as const,
   videoStats: (id: string) => [...queryKeys.videos, id, 'stats'] as const,
   live: ['live'] as const,
-  upload: ['upload'] as const,
+  upload: ['upload'] as const
 }
 
 // Video queries
@@ -21,7 +21,7 @@ export function useVideos(liveOnly?: boolean) {
       const result = await videoAPI.listVideos(liveOnly ? { liveOnly } : undefined)
       return result.videos // Return just the videos array for backward compatibility
     },
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 30 * 1000 // 30 seconds
   })
 }
 
@@ -29,7 +29,7 @@ export function useVideo(id: string) {
   return useQuery({
     queryKey: queryKeys.video(id),
     queryFn: () => videoAPI.getVideo(id),
-    staleTime: 1 * 60 * 1000, // 1 minute
+    staleTime: 1 * 60 * 1000 // 1 minute
   })
 }
 
@@ -37,7 +37,7 @@ export function useVideoStats(id: string) {
   return useQuery({
     queryKey: queryKeys.videoStats(id),
     queryFn: () => analyticsAPI.getStats(id),
-    staleTime: 10 * 1000, // 10 seconds
+    staleTime: 10 * 1000 // 10 seconds
   })
 }
 
@@ -47,7 +47,7 @@ export function useTrackView() {
     mutationFn: (videoId: string) => analyticsAPI.trackView(videoId),
     onSuccess: (_, videoId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.videoStats(videoId) })
-    },
+    }
   })
 }
 
@@ -55,11 +55,10 @@ export function useTrackView() {
 export function useCreateLiveStream() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: { title: string; description?: string }) =>
-      liveAPI.createLiveStream(data),
+    mutationFn: (data: { title: string; description?: string }) => liveAPI.createLiveStream(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.videos })
-    },
+    }
   })
 }
 
@@ -69,7 +68,7 @@ export function useStartLiveStream() {
     mutationFn: (videoId: string) => liveAPI.startLiveStream(videoId),
     onSuccess: (_, videoId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.video(videoId) })
-    },
+    }
   })
 }
 
@@ -79,7 +78,7 @@ export function useStopLiveStream() {
     mutationFn: (videoId: string) => liveAPI.stopLiveStream(videoId),
     onSuccess: (_, videoId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.video(videoId) })
-    },
+    }
   })
 }
 
@@ -87,19 +86,22 @@ export function useStopLiveStream() {
 export function useGetPresignedUrl() {
   return useMutation({
     mutationFn: (data: { fileName: string; fileSize: number; contentType: string }) =>
-      uploadAPI.getPresignedUrl(data),
+      uploadAPI.getPresignedUrl(data)
   })
 }
 
 export function useCompleteUpload() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ videoId, data }: {
+    mutationFn: ({
+      videoId,
+      data
+    }: {
       videoId: string
       data: { key: string; title: string; description?: string }
     }) => uploadAPI.completeUpload(videoId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.videos })
-    },
+    }
   })
 }

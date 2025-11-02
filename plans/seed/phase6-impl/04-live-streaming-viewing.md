@@ -68,6 +68,7 @@ export function LiveIndicator({
 ```
 
 **Features**:
+
 - Pulsing animation for attention
 - Configurable size (sm/md/lg)
 - Optional text label
@@ -293,6 +294,7 @@ export default function LivePage() {
 ```
 
 **Features**:
+
 - Server component with 30s revalidation
 - Shows only active live streams
 - Empty state with CTA to create stream
@@ -325,6 +327,7 @@ export default function TestPage() {
 ```
 
 **Expected**:
+
 - Pulsing animation visible
 - Different sizes work
 - White dot pulses
@@ -335,6 +338,7 @@ export default function TestPage() {
 Visit: `http://localhost:3000/live`
 
 **Expected**:
+
 - If no live streams: Empty state with CTA
 - If live streams exist: Grid of live stream cards
 - Page revalidates every 30s
@@ -344,12 +348,14 @@ Visit: `http://localhost:3000/live`
 **Prerequisites**: Create a live stream via API
 
 **Steps**:
+
 1. Create live stream via API
 2. Start streaming (RTMP or WebRTC)
 3. Visit `/live` page
 4. Click on live stream card
 
 **Expected**:
+
 - Live indicator shows on card
 - Live indicator shows on player
 - HLS plays with low latency
@@ -358,17 +364,20 @@ Visit: `http://localhost:3000/live`
 ### 4. Test Status Transitions
 
 **Test stream going offline**:
+
 1. Watch live stream
 2. Stop stream from host side
 3. Wait 30s for revalidation
 
 **Expected**:
+
 - Stream disappears from `/live` page
 - Video page shows "Uploaded" instead of "Streaming live now"
 
 ### 5. Test Multiple Live Streams
 
 Create multiple live streams and verify:
+
 - All show on `/live` page
 - All have live indicators
 - Can switch between streams
@@ -414,6 +423,7 @@ Create multiple live streams and verify:
 ## Next Steps
 
 After completion, proceed to:
+
 - **Feature 5**: Live Streaming - Broadcasting
 
 ## Notes

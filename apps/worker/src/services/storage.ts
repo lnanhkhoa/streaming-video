@@ -66,7 +66,10 @@ function guessContentType(filePath: string): string {
 
 export class StorageService {
   private client: Client
-  private bucket: string
+  private buckets = {
+    raw: 'videos-raw',
+    processed: 'videos-processed'
+  }
   private uploadTimeoutMs: number
   private downloadTimeoutMs: number
   private retries: number
@@ -79,26 +82,27 @@ export class StorageService {
       accessKey: config.accessKey,
       secretKey: config.secretKey
     })
-    this.bucket = config.bucket
     this.uploadTimeoutMs = config.uploadTimeoutMs ?? 30_000
     this.downloadTimeoutMs = config.downloadTimeoutMs ?? 60_000
     this.retries = config.retries ?? 3
 
-    // Initialize bucket on startup
-    this.ensureBucket().then(
+    // Initialize buckets on startup
+    this.ensureBuckets().then(
       () => console.log('✅ MinIO connected'),
       (err) => console.error('❌ MinIO initialization failed:', err)
     )
   }
 
-  private async ensureBucket(): Promise<void> {
-    await this.withRetry(async () => {
-      const exists = await this.client.bucketExists(this.bucket)
-      if (!exists) {
-        await this.client.makeBucket(this.bucket)
-        console.log(`✅ Created bucket: ${this.bucket}`)
-      }
-    }, 'ensureBucket')
+  private async ensureBuckets(): Promise<void> {
+    for (const bucket of Object.values(this.buckets)) {
+      await this.withRetry(async () => {
+        const exists = await this.client.bucketExists(bucket)
+        if (!exists) {
+          await this.client.makeBucket(bucket)
+          console.log(`✅ Created bucket: ${bucket}`)
+        }
+      }, `ensureBucket:${bucket}`)
+    }
   }
 
   private async withRetry<T>(fn: () => Promise<T>, label: string): Promise<T> {
@@ -123,7 +127,7 @@ export class StorageService {
       const dir = path.dirname(localPath)
       await fsp.mkdir(dir, { recursive: true })
       await withTimeout(
-        this.client.fGetObject(this.bucket, key, localPath),
+        this.client.fGetObject(this.buckets.raw, key, localPath),
         this.downloadTimeoutMs,
         'downloadFile'
       )
@@ -132,14 +136,14 @@ export class StorageService {
       if (!ok) throw new Error(`Downloaded file verification failed for ${localPath}`)
     }
     await this.withRetry(op, `downloadFile:${key}`)
-    console.log(`⬇️  Downloaded s3://${this.bucket}/${key} -> ${localPath}`)
+    console.log(`⬇️  Downloaded s3://${this.buckets.raw}/${key} -> ${localPath}`)
   }
 
   async uploadFile(localPath: string, key: string): Promise<void> {
     const contentType = guessContentType(localPath)
     const op = async () => {
       await withTimeout(
-        this.client.fPutObject(this.bucket, key, localPath, {
+        this.client.fPutObject(this.buckets.processed, key, localPath, {
           'Content-Type': contentType
         }),
         this.uploadTimeoutMs,
@@ -147,7 +151,7 @@ export class StorageService {
       )
     }
     await this.withRetry(op, `uploadFile:${key}`)
-    console.log(`⬆️  Uploaded ${localPath} -> s3://${this.bucket}/${key} (${contentType})`)
+    console.log(`⬆️  Uploaded ${localPath} -> s3://${this.buckets.processed}/${key} (${contentType})`)
   }
 
   async uploadDirectory(localDir: string, prefix: string): Promise<string[]> {
@@ -185,7 +189,7 @@ export class StorageService {
 
   async fileExists(key: string): Promise<boolean> {
     try {
-      await this.withRetry(() => this.client.statObject(this.bucket, key), `fileExists:${key}`)
+      await this.withRetry(() => this.client.statObject(this.buckets.raw, key), `fileExists:${key}`)
       return true
     } catch {
       return false
@@ -195,7 +199,7 @@ export class StorageService {
   async deleteFiles(prefix: string): Promise<void> {
     const keys: string[] = []
     await this.withRetry(async () => {
-      const stream = this.client.listObjectsV2(this.bucket, prefix, true)
+      const stream = this.client.listObjectsV2(this.buckets.processed, prefix, true)
       await new Promise<void>((resolve, reject) => {
         stream.on('data', (obj) => {
           if (obj.name) keys.push(obj.name)
@@ -208,10 +212,10 @@ export class StorageService {
       const chunkSize = 1000
       for (let i = 0; i < keys.length; i += chunkSize) {
         const chunk = keys.slice(i, i + chunkSize)
-        await this.client.removeObjects(this.bucket, chunk)
+        await this.client.removeObjects(this.buckets.processed, chunk)
       }
     }, `deleteFiles:${prefix}`)
-    console.log(`🧹 Deleted ${keys.length} object(s) with prefix ${prefix} in ${this.bucket}`)
+    console.log(`🧹 Deleted ${keys.length} object(s) with prefix ${prefix} in ${this.buckets.processed}`)
   }
 }
 
@@ -221,7 +225,7 @@ export const storageService = new StorageService({
   useSSL: env.MINIO_USE_SSL,
   accessKey: env.MINIO_ACCESS_KEY,
   secretKey: env.MINIO_SECRET_KEY,
-  bucket: 'streaming-video',
+  bucket: '', // Not used, kept for backward compatibility
   uploadTimeoutMs: 30_000,
   downloadTimeoutMs: 60_000,
   retries: 3

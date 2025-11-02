@@ -47,12 +47,7 @@ interface UseVideoPlayerOptions {
   onError?: (error: Error) => void
 }
 
-export function useVideoPlayer({
-  manifestUrl,
-  isLive,
-  onPlay,
-  onError,
-}: UseVideoPlayerOptions) {
+export function useVideoPlayer({ manifestUrl, isLive, onPlay, onError }: UseVideoPlayerOptions) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const hlsRef = useRef<Hls | null>(null)
 
@@ -72,7 +67,7 @@ export function useVideoPlayer({
         liveSyncDurationCount: isLive ? 3 : undefined,
         liveMaxLatencyDurationCount: isLive ? 5 : undefined,
         enableWorker: true,
-        lowLatencyMode: isLive,
+        lowLatencyMode: isLive
       })
 
       hls.loadSource(manifestUrl)
@@ -480,6 +475,7 @@ bun run dev
 Visit: `http://localhost:3000`
 
 **Expected**:
+
 - Grid of video cards
 - Thumbnails displayed (if available)
 - "LIVE" badge on active streams
@@ -490,6 +486,7 @@ Visit: `http://localhost:3000`
 Click on a video card or visit: `http://localhost:3000/videos/[video-id]`
 
 **Expected**:
+
 - HLS player loads
 - Video controls work (play, pause, seek)
 - View count increments on play
@@ -501,6 +498,7 @@ Click on a video card or visit: `http://localhost:3000/videos/[video-id]`
 Try invalid video ID: `http://localhost:3000/videos/invalid-id`
 
 **Expected**:
+
 - Error message displayed gracefully
 
 ### 5. Test Responsive Design
@@ -508,6 +506,7 @@ Try invalid video ID: `http://localhost:3000/videos/invalid-id`
 Resize browser window or use mobile device.
 
 **Expected**:
+
 - Grid adjusts: 1 column (mobile), 2 columns (tablet), 3 columns (desktop)
 - Video player maintains aspect ratio
 
@@ -536,6 +535,7 @@ Resize browser window or use mobile device.
 ## Browser Testing
 
 Test on:
+
 - ✅ Chrome (HLS.js)
 - ✅ Safari (Native HLS)
 - ✅ Firefox (HLS.js)
@@ -544,6 +544,7 @@ Test on:
 ## Next Steps
 
 After completion, can proceed to:
+
 - **Feature 3**: Video Upload
 - **Feature 4**: Live Streaming - Viewing
 

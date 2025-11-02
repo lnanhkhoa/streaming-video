@@ -52,7 +52,7 @@ class AnalyticsService {
   async getStats(videoId: string): Promise<VideoStats | null> {
     // Check cache
     const cached = await cacheService.getVideoStats<VideoStats>(videoId)
-    if (cached) return cached
+    // if (cached) return cached
 
     // Query database
     const video = await prisma.video.findUnique({

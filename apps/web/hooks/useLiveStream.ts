@@ -22,13 +22,13 @@ export function useLiveStream({ onStreamReady, onError }: UseLiveStreamOptions =
         video: {
           width: { ideal: 1920 },
           height: { ideal: 1080 },
-          facingMode: 'user', // Front camera for selfie mode
+          facingMode: 'user' // Front camera for selfie mode
         },
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          autoGainControl: true,
-        },
+          autoGainControl: true
+        }
       })
 
       streamRef.current = mediaStream
@@ -45,7 +45,7 @@ export function useLiveStream({ onStreamReady, onError }: UseLiveStreamOptions =
   // Stop stream and release devices
   const stopStream = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop())
+      streamRef.current.getTracks().forEach((track) => track.stop())
       streamRef.current = null
       setStream(null)
       setIsStreaming(false)
@@ -91,6 +91,6 @@ export function useLiveStream({ onStreamReady, onError }: UseLiveStreamOptions =
     stopStream,
     toggleCamera,
     toggleMic,
-    setIsStreaming,
+    setIsStreaming
   }
 }

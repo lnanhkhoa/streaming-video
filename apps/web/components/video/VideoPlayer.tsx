@@ -19,15 +19,13 @@ export function VideoPlayer({ videoId, manifestUrl, isLive }: VideoPlayerProps) 
     manifestUrl,
     isLive,
     onPlay: trackView,
-    onError: (err) => setError(err.message),
+    onError: (err) => setError(err.message)
   })
 
   return (
     <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden">
       {isLive && (
-        <Badge className="absolute top-4 left-4 z-10 bg-red-600 text-white">
-          🔴 LIVE
-        </Badge>
+        <Badge className="absolute top-4 left-4 z-10 bg-red-600 text-white">🔴 LIVE</Badge>
       )}
 
       {error && (
@@ -39,13 +37,7 @@ export function VideoPlayer({ videoId, manifestUrl, isLive }: VideoPlayerProps) 
         </div>
       )}
 
-      <video
-        ref={videoRef}
-        controls
-        className="w-full h-full"
-        onPlay={handlePlay}
-        playsInline
-      />
+      <video ref={videoRef} controls className="w-full h-full" onPlay={handlePlay} playsInline />
     </div>
   )
 }

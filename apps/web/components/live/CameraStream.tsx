@@ -13,13 +13,9 @@ interface CameraStreamProps {
 
 export function CameraStream({ videoId, isStreaming, onStreamReady }: CameraStreamProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
-  const {
-    stream,
-    error,
-    requestMediaAccess,
-  } = useLiveStream({
+  const { stream, error, requestMediaAccess } = useLiveStream({
     onStreamReady,
-    onError: (err) => console.error('Media access error:', err),
+    onError: (err) => console.error('Media access error:', err)
   })
 
   // Attach stream to video element

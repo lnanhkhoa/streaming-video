@@ -14,6 +14,7 @@ Build Next.js 14 app with React 19. Features: video browsing, upload, playback (
 The implementation is divided into 6 focused features (see `phase6-impl/` directory):
 
 ### Feature 1: Foundation & Setup (2-3h, P0)
+
 **File**: `01-foundation-setup.md`
 
 - Install dependencies (HLS.js, React Query, Zustand, Lucide)
@@ -23,11 +24,13 @@ The implementation is divided into 6 focused features (see `phase6-impl/` direct
 - Setup QueryClientProvider
 
 **Key Files**:
+
 - `lib/api.ts` - API client with TypeScript types
 - `lib/hooks.ts` - TanStack Query hooks
 - `app/providers.tsx` - QueryClientProvider
 
 ### Feature 2: Video Browsing & Playback (4-5h, P0)
+
 **File**: `02-video-browsing-playback.md`
 
 - Home page with video grid
@@ -37,6 +40,7 @@ The implementation is divided into 6 focused features (see `phase6-impl/` direct
 - Low latency HLS for live streams
 
 **Key Components**:
+
 - `components/video/VideoPlayer.tsx` - HLS.js player
 - `components/video/VideoCard.tsx` - Video thumbnail card
 - `components/video/VideoList.tsx` - Grid layout
@@ -45,6 +49,7 @@ The implementation is divided into 6 focused features (see `phase6-impl/` direct
 - `hooks/useViewTracking.ts` - View tracking
 
 ### Feature 3: Video Upload (3-4h, P1)
+
 **File**: `03-video-upload.md`
 
 - Upload page with form
@@ -54,10 +59,12 @@ The implementation is divided into 6 focused features (see `phase6-impl/` direct
 - Processing status updates
 
 **Key Components**:
+
 - `components/video/UploadForm.tsx` - Upload form with progress
 - `app/videos/upload/page.tsx` - Upload page
 
 ### Feature 4: Live Streaming - Viewing (2-3h, P1)
+
 **File**: `04-live-streaming-viewing.md`
 
 - Live streams browse page
@@ -66,10 +73,12 @@ The implementation is divided into 6 focused features (see `phase6-impl/` direct
 - Empty states with CTAs
 
 **Key Components**:
+
 - `components/live/LiveIndicator.tsx` - Reusable live badge
 - `app/live/page.tsx` - Browse live streams
 
 ### Feature 5: Live Streaming - Broadcasting (5-6h, P1)
+
 **File**: `05-live-streaming-broadcasting.md`
 
 - Create live stream page
@@ -79,6 +88,7 @@ The implementation is divided into 6 focused features (see `phase6-impl/` direct
 - Host streaming interface
 
 **Key Components**:
+
 - `components/live/CameraStream.tsx` - Camera capture with preview
 - `components/live/StreamControls.tsx` - Control buttons
 - `hooks/useLiveStream.ts` - Media stream management
@@ -86,6 +96,7 @@ The implementation is divided into 6 focused features (see `phase6-impl/` direct
 - `app/live/stream/[id]/page.tsx` - Host streaming
 
 ### Feature 6: Layout & Navigation (2-3h, P0)
+
 **File**: `06-layout-navigation.md`
 
 - Sticky navigation header
@@ -95,6 +106,7 @@ The implementation is divided into 6 focused features (see `phase6-impl/` direct
 - Global styles and accessibility
 
 **Key Components**:
+
 - `components/layout/Header.tsx` - Navigation with active states
 - `components/layout/Footer.tsx` - Footer links
 - `components/ui/logo.tsx` - Brand logo
@@ -167,15 +179,18 @@ apps/web/
 ### Alternative Parallel Approach
 
 **Day 1** (6-8 hours):
+
 - Feature 1: Foundation & Setup
 - Feature 6: Layout & Navigation
 - Start Feature 2: Video Browsing
 
 **Day 2** (6-8 hours):
+
 - Complete Feature 2: Video Browsing & Playback
 - Feature 3: Video Upload
 
 **Day 3** (6-8 hours):
+
 - Feature 4: Live Streaming - Viewing
 - Feature 5: Live Streaming - Broadcasting
 
@@ -244,6 +259,7 @@ open http://localhost:3000
 ```
 
 **Test Sequence**:
+
 1. Home page - Browse videos (`/`)
 2. Video player - Watch VOD (`/videos/[id]`)
 3. Upload - Upload new video (`/videos/upload`)
@@ -254,6 +270,7 @@ open http://localhost:3000
 ### Browser Compatibility Testing
 
 Test on:
+
 - ✅ Chrome (HLS.js, getUserMedia, WebRTC)
 - ✅ Safari (Native HLS, getUserMedia, WebRTC)
 - ✅ Firefox (HLS.js, getUserMedia, WebRTC)
@@ -276,6 +293,7 @@ Test on:
 ## Verification Checklist
 
 ### Functional Requirements
+
 - ✅ Browse all videos (grid layout)
 - ✅ Watch videos with HLS playback
 - ✅ Upload videos (up to 500MB)
@@ -285,6 +303,7 @@ Test on:
 - ✅ Consistent navigation across app
 
 ### Technical Requirements
+
 - ✅ TypeScript compilation passes
 - ✅ No console errors
 - ✅ Responsive on all devices
@@ -293,6 +312,7 @@ Test on:
 - ✅ SEO-friendly (metadata, SSR)
 
 ### User Experience
+
 - ✅ Loading states for async operations
 - ✅ Error handling with user-friendly messages
 - ✅ Progress indicators for uploads/streaming
@@ -302,6 +322,7 @@ Test on:
 ## Success Criteria
 
 ### Users Can
+
 - ✅ Browse all videos in responsive grid
 - ✅ Watch videos with adaptive HLS streaming
 - ✅ Upload videos with real-time progress
@@ -311,6 +332,7 @@ Test on:
 - ✅ Use app on mobile devices
 
 ### App Provides
+
 - ✅ Consistent navigation (header/footer)
 - ✅ Real-time view statistics
 - ✅ Clear visual feedback
@@ -320,6 +342,7 @@ Test on:
 ## Known Limitations & Future Enhancements
 
 ### Current Limitations
+
 1. **WebRTC not fully implemented** - Streaming calls API but doesn't establish actual connection
 2. **No RTMP streaming** - Could add for OBS/external tools
 3. **No real-time viewer count** - Could add via WebSocket
@@ -327,6 +350,7 @@ Test on:
 5. **iOS WebRTC limitations** - Mobile Safari has limited support
 
 ### Future Enhancements
+
 1. **Authentication** - User login, profiles, subscriptions
 2. **Search** - Full-text search for videos
 3. **Recommendations** - AI-powered video recommendations
@@ -341,20 +365,25 @@ Test on:
 ## Resources
 
 ### Documentation
+
 - [Next.js 14 Docs](https://nextjs.org/docs)
 - [HLS.js Documentation](https://github.com/video-dev/hls.js)
 - [Shadcn/UI Components](https://ui.shadcn.com)
 - [TanStack Query Docs](https://tanstack.com/query/latest)
 
 ### API Endpoints
+
 Reference `apps/api/src/routes/` for available endpoints:
+
 - `/api/videos/*` - Video management
 - `/api/upload/*` - Upload handling
 - `/api/live/*` - Live streaming
 - `/api/analytics/*` - View analytics
 
 ### Detailed Plans
+
 See `phase6-impl/` directory:
+
 - `README.md` - Overview and feature summary
 - `01-foundation-setup.md` - Dependencies and setup
 - `02-video-browsing-playback.md` - Video player and browsing
@@ -366,6 +395,7 @@ See `phase6-impl/` directory:
 ## Notes
 
 ### Development Best Practices
+
 - Use React Server Components where possible (data fetching)
 - Client components only when needed (camera, player, state)
 - TanStack Query for all API calls (caching, invalidation)
@@ -375,6 +405,7 @@ See `phase6-impl/` directory:
 - Follow Shadcn/UI design patterns
 
 ### Performance Optimization
+
 - HLS.js adaptive bitrate streaming
 - TanStack Query caching reduces API calls
 - Low latency HLS for live streams (3-5s delay)
@@ -383,9 +414,10 @@ See `phase6-impl/` directory:
 - Code splitting with dynamic imports
 
 ### Security Considerations
+
 - Presigned URLs for secure uploads (no credentials in frontend)
 - File size limits (500MB prevents abuse)
-- File type validation (video/* only)
+- File type validation (video/\* only)
 - CORS configured for API calls
 - Media permissions requested explicitly
 - No sensitive data in client code

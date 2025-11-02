@@ -336,6 +336,7 @@ bun run dev
 Visit: `http://localhost:3000/videos/upload`
 
 **Expected**:
+
 - Upload form displayed
 - File input, title, description fields
 - Requirements section visible
@@ -343,15 +344,18 @@ Visit: `http://localhost:3000/videos/upload`
 ### 3. Test File Selection
 
 **Test 1: Valid video file**
+
 - Select MP4/MOV file < 500MB
 - Expected: File name and size displayed
 - Expected: Title auto-filled from filename
 
 **Test 2: Invalid file type**
+
 - Select non-video file (e.g., PDF, image)
 - Expected: Error message "Please select a valid video file"
 
 **Test 3: File too large**
+
 - Select video > 500MB
 - Expected: Error message "File size must be less than 500MB"
 
@@ -360,12 +364,14 @@ Visit: `http://localhost:3000/videos/upload`
 **Prerequisites**: API server running on `localhost:3001`
 
 **Steps**:
+
 1. Select valid video file
 2. Enter title (e.g., "Test Upload")
 3. Enter description (optional)
 4. Click "Upload Video"
 
 **Expected**:
+
 - Progress bar shows 0-100%
 - Status changes: "Uploading..." → "Processing video..." → "✅ Upload complete!"
 - Redirect to video page after completion
@@ -373,16 +379,19 @@ Visit: `http://localhost:3000/videos/upload`
 ### 5. Test Error Handling
 
 **Test 1: Empty title**
+
 - Select file but leave title empty
 - Click "Upload Video"
 - Expected: Error "Please select a file and enter a title"
 
 **Test 2: No file selected**
+
 - Enter title but don't select file
 - Click "Upload Video"
 - Expected: Upload button disabled
 
 **Test 3: Network error (simulate)**
+
 - Disconnect network during upload
 - Expected: Error "Upload failed due to network error"
 - Expected: "Retry Upload" button appears
@@ -390,6 +399,7 @@ Visit: `http://localhost:3000/videos/upload`
 ### 6. Test Reset Functionality
 
 After error:
+
 1. Click "Reset" button
 2. Expected: Form cleared, ready for new upload
 
@@ -427,6 +437,7 @@ After error:
 ## Next Steps
 
 After completion, proceed to:
+
 - **Feature 4**: Live Streaming - Viewing
 - **Feature 5**: Live Streaming - Broadcasting
 

@@ -50,16 +50,13 @@ export interface ViewStats {
  * Make API request with standardized response handling
  * Automatically unwraps { success: true, data: T } responses
  */
-async function apiRequest<T>(
-  path: string,
-  options?: RequestInit,
-): Promise<T> {
+async function apiRequest<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...options?.headers,
-    },
+      ...options?.headers
+    }
   })
 
   const json = await res.json()
@@ -80,11 +77,11 @@ async function apiRequest<T>(
 export const videoAPI = {
   listVideos: (liveOnly?: boolean) => {
     const query = liveOnly ? '?live=true' : ''
-    return apiRequest<Video[]>(`/api/videos/list${query}`)
+    return apiRequest<Video[]>(`/api/videos${query}`)
   },
   getVideo: (id: string) => apiRequest<Video>(`/api/videos/${id}`),
   getVideoStats: (id: string) => apiRequest<ViewStats>(`/api/videos/${id}/stats`),
-  trackView: (id: string) => apiRequest(`/api/videos/${id}/view`, { method: 'POST' }),
+  trackView: (id: string) => apiRequest(`/api/videos/${id}/view`, { method: 'POST' })
 }
 
 // Live streaming endpoints
@@ -92,12 +89,11 @@ export const liveAPI = {
   createLiveStream: (data: { title: string; description?: string }) =>
     apiRequest<LiveStream>('/api/live/create', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     }),
   startLiveStream: (videoId: string) =>
     apiRequest(`/api/live/${videoId}/start`, { method: 'POST' }),
-  stopLiveStream: (videoId: string) =>
-    apiRequest(`/api/live/${videoId}/stop`, { method: 'POST' }),
+  stopLiveStream: (videoId: string) => apiRequest(`/api/live/${videoId}/stop`, { method: 'POST' })
 }
 
 // Upload endpoints
@@ -105,11 +101,11 @@ export const uploadAPI = {
   getUploadUrl: (filename: string) =>
     apiRequest<{ uploadUrl: string; key: string }>('/api/upload/url', {
       method: 'POST',
-      body: JSON.stringify({ filename }),
+      body: JSON.stringify({ filename })
     }),
   completeUpload: (data: { key: string; title: string; description?: string }) =>
     apiRequest<Video>('/api/upload/complete', {
       method: 'POST',
-      body: JSON.stringify(data),
-    }),
+      body: JSON.stringify(data)
+    })
 }

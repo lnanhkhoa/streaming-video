@@ -1,7 +1,11 @@
 import { serve } from '@hono/node-server'
-import app from './app'
+import { app } from './app'
 import { env } from './env'
 import { initializeScheduler } from './utils/scheduler'
+import { cacheService } from './services/cache.service'
+
+// Export AppType for RPC client type inference
+export type AppType = typeof app
 
 const port = env.PORT
 
@@ -23,9 +27,11 @@ async function startServer() {
 
     // Storage service initializes on import (singleton)
     console.log('✅ Storage service initialized')
+    // await storageService
 
     // Cache service initializes on import (singleton)
     console.log('✅ Cache service initialized')
+    await cacheService.flushDb()
 
     // Queue service will connect when first used
     console.log('✅ Queue service ready')

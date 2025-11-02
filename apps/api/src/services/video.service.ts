@@ -27,7 +27,7 @@ class VideoService {
     // Check cache
     const cacheKey = `video:list:${JSON.stringify(options)}`
     const cached = await cacheService.get<{ videos: Video[]; total: number }>(cacheKey)
-    if (cached) return cached
+    // if (cached) return cached
 
     // Query database
     const where: any = {}
@@ -60,7 +60,7 @@ class VideoService {
     // Check cache
     const cacheKey = `video:${id}`
     const cached = await cacheService.get<VideoWithVariants>(cacheKey)
-    if (cached) return cached
+    // if (cached) return cached
 
     // Query database
     const video = await prisma.video.findUnique({

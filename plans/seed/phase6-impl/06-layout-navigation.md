@@ -454,11 +454,7 @@ html {
 
 /* Video player custom styles */
 video::-webkit-media-controls-panel {
-  background-image: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0.5)
-  );
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5));
 }
 ```
 
@@ -467,12 +463,14 @@ video::-webkit-media-controls-panel {
 ### 1. Test Header Navigation
 
 **Desktop**:
+
 1. Visit all pages (`/`, `/live`, `/videos/upload`, `/live/create`)
 2. Verify active state highlights correct nav item
 3. Test logo click → redirects to home
 4. Test all nav links work
 
 **Mobile** (resize to < 768px):
+
 1. Verify mobile nav appears at bottom
 2. Test all mobile nav links
 3. Verify action buttons stack properly
@@ -480,6 +478,7 @@ video::-webkit-media-controls-panel {
 ### 2. Test Footer
 
 **Scroll to bottom on any page**:
+
 1. Verify all footer sections display
 2. Test footer links (may 404 for unimplemented pages)
 3. Verify social links open in new tab
@@ -488,6 +487,7 @@ video::-webkit-media-controls-panel {
 ### 3. Test Layout Consistency
 
 Visit each page and verify:
+
 - Header always at top (sticky)
 - Footer always at bottom
 - Content fills space between
@@ -496,6 +496,7 @@ Visit each page and verify:
 ### 4. Test Navigation Flow
 
 **User flow test**:
+
 1. Start at home (`/`)
 2. Click "Upload" → Upload page
 3. Click logo → Back to home
@@ -506,12 +507,14 @@ Visit each page and verify:
 ### 5. Accessibility Testing
 
 **Keyboard navigation**:
+
 1. Tab through header links
 2. Verify focus indicators visible
 3. Test Enter to activate links
 4. Tab through footer links
 
 **Screen reader** (if available):
+
 - Verify landmarks (header, main, footer)
 - Test alt text for logo
 - Verify aria-labels on social icons
@@ -550,6 +553,7 @@ Visit each page and verify:
 - **Desktop**: > 1024px
 
 **Behavior**:
+
 - Mobile: Bottom nav, stacked buttons
 - Tablet: Top nav, buttons visible
 - Desktop: Full nav, all elements visible
@@ -567,6 +571,7 @@ To customize branding:
 ## Next Steps
 
 After completion:
+
 - All features now connected via navigation
 - Users can navigate entire app
 - Consider adding user authentication (future)

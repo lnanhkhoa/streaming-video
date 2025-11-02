@@ -66,6 +66,7 @@ ffmpeg -version
 **`src/transcoder.ts`** - Fully implemented:
 
 **Implemented Functions**:
+
 - ✅ `getVideoMetadata(inputPath)` - Extract duration, resolution, codec info
 - ✅ `generateThumbnail(inputPath, outputPath)` - Create thumbnail at 1s mark
 - ✅ `transcodeToHLS(options)` - Main HLS transcoding with 3 variants
@@ -74,6 +75,7 @@ ffmpeg -version
 - ✅ `transcodeVideo(videoId, inputKey)` - Complete workflow orchestration
 
 Key features implemented:
+
 - ✅ Input: Video file from MinIO
 - ✅ Output: HLS with 3 variants (480p, 720p, 1080p)
 - ✅ Generate thumbnail (720p resolution)
@@ -110,6 +112,7 @@ Reference detailed plan section 4.2 for complete implementation.
 **`src/consumer.ts`** - Fully implemented:
 
 **Implemented Functions**:
+
 - ✅ `connectRabbitMQ()` - Connection management with retry logic
 - ✅ `startWorker()` - Main worker loop with job processing
 - ✅ `processTranscodeJob(job)` - VOD transcoding workflow
@@ -117,6 +120,7 @@ Reference detailed plan section 4.2 for complete implementation.
 - ✅ Helper functions for variant dimensions and bitrates
 
 **Flow Implemented**:
+
 1. ✅ Connect to RabbitMQ with connection pooling
 2. ✅ Assert queues: 'video-transcode', 'live-stream-start', 'live-stream-stop'
 3. ✅ Consume messages with prefetch limit
@@ -125,6 +129,7 @@ Reference detailed plan section 4.2 for complete implementation.
 6. ✅ Ack on success / Nack on failure with retry logic
 
 **Job Types Supported**:
+
 ```typescript
 interface TranscodeJob {
   videoId: string
@@ -148,12 +153,14 @@ interface StopLiveStreamJob {
 **`src/live-stream.ts`** - Fully implemented with advanced features:
 
 **Implemented Classes & Functions**:
+
 - ✅ `LiveStreamManager` class - Singleton manager for active streams
 - ✅ `startLiveStream(videoId, streamKey)` - Initialize live HLS transcoding
 - ✅ `stopLiveStream(videoId)` - Graceful stream termination
 - ✅ Active stream tracking with metadata
 
 **Features Implemented**:
+
 - ✅ RTMP stream reception (via nginx-rtmp integration)
 - ✅ Real-time HLS conversion with low latency
 - ✅ Continuous segment upload to MinIO
@@ -164,12 +171,14 @@ interface StopLiveStreamJob {
 **`src/hls-packager.ts`** ✅:
 
 **Implemented Functions**:
+
 - ✅ Real-time segment detection and upload
 - ✅ File system watcher for new segments
 - ✅ Manifest synchronization to MinIO
 - ✅ Cleanup of old segments
 
 **FFmpeg Configuration**:
+
 ```bash
 ffmpeg -i rtmp://localhost:1935/live/{streamKey} \
   -c:v libx264 -preset veryfast -tune zerolatency \
@@ -187,6 +196,7 @@ ffmpeg -i rtmp://localhost:1935/live/{streamKey} \
 **`src/services/storage.ts`** - Fully implemented:
 
 **Implemented Class Methods**:
+
 ```typescript
 class StorageService {
   private client: Client
@@ -203,6 +213,7 @@ export const storageService = new StorageService()
 ```
 
 **Features**:
+
 - ✅ MinIO client singleton initialization
 - ✅ Automatic bucket creation/verification
 - ✅ Batch upload support for HLS segments
@@ -251,6 +262,7 @@ main().catch((error) => {
 - ✅ Timeout handling → long-running jobs monitored
 
 **Error Flow**:
+
 1. Catch error at appropriate layer (FFmpeg, Storage, Database)
 2. Log error with context (videoId, job details)
 3. Update video status to 'FAILED' with error message
@@ -258,6 +270,7 @@ main().catch((error) => {
 5. Nack message to RabbitMQ (allow retry or DLQ)
 
 **Additional Features**:
+
 - ✅ Graceful shutdown on SIGINT/SIGTERM
 - ✅ Process cleanup on worker restart
 - ✅ Dead letter queue for failed jobs (future)
@@ -337,6 +350,7 @@ Test complete flow:
 ## Implementation Notes
 
 ### Completed
+
 - ✅ All VOD transcoding features (3 HLS variants + thumbnail)
 - ✅ Live streaming with RTMP integration
 - ✅ RabbitMQ consumer with multi-queue support
@@ -348,6 +362,7 @@ Test complete flow:
 - ✅ Utility functions for common operations
 
 ### Architectural Decisions
+
 - Used `fluent-ffmpeg` for FFmpeg control (easier API than direct spawn)
 - Singleton pattern for StorageService and LiveStreamManager
 - Multi-queue RabbitMQ setup (transcode, live-start, live-stop)
@@ -355,6 +370,7 @@ Test complete flow:
 - Prefetch limit: 1 (one job per worker for consistent performance)
 
 ### Enhancements Beyond Original Plan
+
 1. **Health & Metrics**: Added health.ts and metrics.ts for monitoring
 2. **Utility Functions**: Common helpers in utils.ts
 3. **Live Stream Manager**: State management for active streams
@@ -362,6 +378,7 @@ Test complete flow:
 5. **Multiple Queues**: Separate queues for different job types
 
 ### Technical Debt / Future Work
+
 - ⏸️ Implement dead letter queue for failed jobs
 - ⏸️ Add progress tracking via WebSocket
 - ⏸️ Support more video formats (currently optimized for MP4)
@@ -371,6 +388,7 @@ Test complete flow:
 - ⏸️ Add subtitle/caption support in HLS
 
 **Reference**:
+
 - Detailed implementation plans: `plans/seed/phase4-impl/` (6 detailed plans)
 - Keep temp directory clean ✅
 - Handle concurrent jobs properly (prefetch: 1) ✅

@@ -23,7 +23,7 @@ export function StreamControls({
   onStopStream,
   onToggleCamera,
   onToggleMic,
-  disabled = false,
+  disabled = false
 }: StreamControlsProps) {
   return (
     <Card className="p-6">
@@ -109,12 +109,10 @@ export function StreamControls({
             )}
           </p>
           <p>
-            <span className="font-medium">Camera:</span>{' '}
-            {isCameraOn ? 'On' : 'Off'}
+            <span className="font-medium">Camera:</span> {isCameraOn ? 'On' : 'Off'}
           </p>
           <p>
-            <span className="font-medium">Microphone:</span>{' '}
-            {isMicOn ? 'On' : 'Off'}
+            <span className="font-medium">Microphone:</span> {isMicOn ? 'On' : 'Off'}
           </p>
         </div>
       </div>

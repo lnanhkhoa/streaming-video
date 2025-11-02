@@ -10,7 +10,6 @@ import { createServer } from 'node:http'
 import { env } from './env'
 import { metrics } from './services/metrics'
 
-
 export function startHealthServer(): void {
   const server = createServer((req, res) => {
     // CORS headers
