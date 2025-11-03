@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { videoAPI, liveAPI, uploadAPI, analyticsAPI } from './api-rpc'
+import { videoAPI, uploadAPI, analyticsAPI } from './api-rpc'
 import { AllowedVideoTypes } from '@repo/constants'
 
 // Query keys
@@ -10,7 +10,6 @@ export const queryKeys = {
   videoList: (liveOnly?: boolean) => [...queryKeys.videos, 'list', liveOnly] as const,
   video: (id: string) => [...queryKeys.videos, id] as const,
   videoStats: (id: string) => [...queryKeys.videos, id, 'stats'] as const,
-  live: ['live'] as const,
   upload: ['upload'] as const
 }
 
@@ -48,37 +47,6 @@ export function useTrackView() {
     mutationFn: (videoId: string) => analyticsAPI.trackView(videoId),
     onSuccess: (_, videoId) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.videoStats(videoId) })
-    }
-  })
-}
-
-// Live streaming mutations
-export function useCreateLiveStream() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (data: { title: string; description?: string }) => liveAPI.createLiveStream(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.videos })
-    }
-  })
-}
-
-export function useStartLiveStream() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (videoId: string) => liveAPI.startLiveStream(videoId),
-    onSuccess: (_, videoId) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.video(videoId) })
-    }
-  })
-}
-
-export function useStopLiveStream() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (videoId: string) => liveAPI.stopLiveStream(videoId),
-    onSuccess: (_, videoId) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.video(videoId) })
     }
   })
 }

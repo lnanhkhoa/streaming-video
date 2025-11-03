@@ -5,7 +5,6 @@ import { errorHandler } from './middlewares/error'
 import { videoRoutes } from './routes/videos'
 import { uploadRoutes } from './routes/upload'
 import { analyticsRoutes } from './routes/analytics'
-import { liveRoutes } from './routes/live'
 import { prettyJSON } from 'hono/pretty-json'
 
 // Create base app with middleware
@@ -21,7 +20,6 @@ const app = router
   .route('/api/videos', videoRoutes)
   .route('/api/upload', uploadRoutes)
   .route('/api/analytics', analyticsRoutes)
-  .route('/api/live', liveRoutes)
 
 app.onError(errorHandler)
 

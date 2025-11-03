@@ -1,12 +1,6 @@
 import { env } from '@/env'
 import { AppType } from '@apps/api'
-import type {
-  Video,
-  VideoStatsResponse,
-  CreateLiveStreamRequest,
-  VideoVisibility,
-  AllowedVideoTypes
-} from '@repo/constants'
+import type { Video, VideoStatsResponse, VideoVisibility, AllowedVideoTypes } from '@repo/constants'
 import { hc } from 'hono/client'
 
 export const rpcClient = hc<AppType>(env.API_URL)
@@ -96,58 +90,6 @@ export const analyticsAPI = {
    */
   getStats: async (id: string): Promise<VideoStatsResponse> => {
     const res = await rpcClient.api.analytics.stats[':id'].$get({ param: { id } })
-    return unwrapResponse(res)
-  }
-}
-
-// Live streaming endpoints
-export const liveAPI = {
-  /**
-   * Create a new live stream
-   */
-  createLiveStream: async (
-    data: CreateLiveStreamRequest
-  ): Promise<{
-    videoId: string
-    streamKey: string
-    rtmpUrl: string
-  }> => {
-    const res = await rpcClient.api.live.create.$post({
-      json: data
-    })
-    return unwrapResponse(res)
-  },
-
-  /**
-   * Start a live stream
-   */
-  startLiveStream: async (
-    videoId: string
-  ): Promise<{
-    message: string
-    videoId: string
-    status: string
-  }> => {
-    const res = await rpcClient.api.live[':id'].start.$post({
-      param: { id: videoId },
-      json: { streamKey: '' } // Will be validated by API
-    })
-    return unwrapResponse(res)
-  },
-
-  /**
-   * Stop a live stream
-   */
-  stopLiveStream: async (
-    videoId: string
-  ): Promise<{
-    message: string
-    status: string
-  }> => {
-    const res = await rpcClient.api.live[':id'].stop.$post({
-      param: { id: videoId },
-      json: {}
-    })
     return unwrapResponse(res)
   }
 }

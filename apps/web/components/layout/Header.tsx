@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Logo } from '@/components/ui/logo'
 import { Button } from '@/components/ui/button'
-import { Video, Upload, Radio } from 'lucide-react'
+import { Video, Upload } from 'lucide-react'
 
 export function Header() {
   const pathname = usePathname()
@@ -16,20 +16,10 @@ export function Header() {
     return pathname.startsWith(path)
   }
 
-  const navItems = [
-    { href: '/', label: 'Videos', icon: Video },
-    { href: '/live', label: 'Live', icon: Radio }
-  ]
+  const navItems = [{ href: '/', label: 'Videos', icon: Video }]
 
   const actionButtons = [
-    { href: '/videos/upload', label: 'Upload', icon: Upload, variant: 'outline' as const },
-    {
-      href: '/live/create',
-      label: 'Go Live',
-      icon: Radio,
-      variant: 'default' as const,
-      highlight: true
-    }
+    { href: '/videos/upload', label: 'Upload', icon: Upload, variant: 'outline' as const }
   ]
 
   return (
@@ -64,11 +54,7 @@ export function Header() {
             const Icon = button.icon
             return (
               <Link key={button.href} href={button.href}>
-                <Button
-                  variant={button.variant}
-                  size="sm"
-                  className={button.highlight ? 'bg-red-600 hover:bg-red-700' : ''}
-                >
+                <Button variant={button.variant} size="sm">
                   <Icon className="w-4 h-4 mr-2" />
                   <span className="hidden sm:inline">{button.label}</span>
                 </Button>

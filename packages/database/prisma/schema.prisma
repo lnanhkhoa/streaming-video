@@ -26,10 +26,6 @@ model Video {
   // Processed variants
   hlsManifestKey  String?
 
-  // Live streaming info
-  streamKey       String?        @unique  // For RTMP ingest
-  isLiveNow       Boolean        @default(false)
-
   // Transcoding progress tracking
   transcodingProgress    Int?           // 0-100 percentage
   transcodingStartedAt   DateTime?      // When transcoding started
@@ -51,7 +47,6 @@ model Video {
   @@index([status])
   @@index([visibility])
   @@index([videoType])
-  @@index([isLiveNow])
 }
 
 enum VideoStatus {
