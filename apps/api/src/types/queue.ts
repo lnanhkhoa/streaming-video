@@ -13,7 +13,6 @@ export type TranscodeJob = z.infer<typeof transcodeJobSchema>
 export const startLiveStreamJobSchema = z.object({
   type: z.literal('start-live-stream'),
   videoId: z.string(),
-  streamKey: z.string().min(1),
   inputSource: z.string().min(1) // RTMP URL, file path, or HTTP stream URL
 })
 

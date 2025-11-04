@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import type { Video } from '@repo/constants'
 import { VideoStats } from './VideoStats'
 import { env } from '@/env'
@@ -31,10 +30,6 @@ export function VideoCard({ video }: VideoCardProps) {
               <div className="w-full h-full flex items-center justify-center text-gray-400">
                 No thumbnail
               </div>
-            )}
-
-            {video.isLiveNow && (
-              <Badge className="absolute top-2 right-2 bg-red-600 text-white">🔴 LIVE</Badge>
             )}
           </div>
         </CardHeader>

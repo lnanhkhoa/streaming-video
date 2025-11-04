@@ -24,7 +24,6 @@ describe('Videos Routes', () => {
             status: 'READY',
             videoType: 'VOD',
             visibility: 'PUBLIC',
-            isLiveNow: false,
             viewsToday: 0,
             viewsMonth: 0,
             viewsTotal: 0
@@ -35,7 +34,6 @@ describe('Videos Routes', () => {
             status: 'READY',
             videoType: 'VOD',
             visibility: 'PUBLIC',
-            isLiveNow: false,
             viewsToday: 0,
             viewsMonth: 0,
             viewsTotal: 0
@@ -59,7 +57,6 @@ describe('Videos Routes', () => {
             status: 'READY',
             videoType: 'VOD',
             visibility: 'PUBLIC',
-            isLiveNow: false,
             viewsToday: 0,
             viewsMonth: 0,
             viewsTotal: 0
@@ -70,7 +67,6 @@ describe('Videos Routes', () => {
             status: 'PENDING',
             videoType: 'VOD',
             visibility: 'PUBLIC',
-            isLiveNow: false,
             viewsToday: 0,
             viewsMonth: 0,
             viewsTotal: 0
@@ -95,7 +91,6 @@ describe('Videos Routes', () => {
           status: 'READY',
           videoType: 'VOD',
           visibility: 'PUBLIC',
-          isLiveNow: false,
           viewsToday: 0,
           viewsMonth: 0,
           viewsTotal: 0
@@ -128,7 +123,6 @@ describe('Videos Routes', () => {
           status: 'READY',
           videoType: 'VOD',
           visibility: 'PUBLIC',
-          isLiveNow: false,
           viewsToday: 0,
           viewsMonth: 0,
           viewsTotal: 0
@@ -165,7 +159,6 @@ describe('Videos Routes', () => {
           status: 'READY',
           videoType: 'VOD',
           visibility: 'PUBLIC',
-          isLiveNow: false,
           viewsToday: 0,
           viewsMonth: 0,
           viewsTotal: 0

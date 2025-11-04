@@ -111,8 +111,6 @@ class VideoService {
         hlsManifestKey: video.hlsManifestKey ?? undefined,
         thumbnailKey: video.thumbnailKey ?? undefined,
         duration: video.duration ?? undefined,
-        streamKey: video.streamKey ?? undefined,
-        isLiveNow: video.isLiveNow,
         viewsToday: video.viewsToday,
         viewsMonth: video.viewsMonth,
         viewsTotal: video.viewsTotal,

@@ -85,8 +85,7 @@ async function main() {
       description: 'Test live stream',
       status: 'PENDING',
       videoType: 'LIVE',
-      visibility: 'PUBLIC',
-      isLiveNow: false
+      visibility: 'PUBLIC'
     }
   })
 

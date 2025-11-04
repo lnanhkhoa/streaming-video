@@ -20,6 +20,5 @@ export interface TranscodeResult {
 
 export interface LiveStreamConfig {
   videoId: string
-  streamKey: string
   outputDir: string
 }

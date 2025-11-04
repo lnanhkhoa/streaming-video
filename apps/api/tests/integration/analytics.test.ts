@@ -14,7 +14,6 @@ describe('Analytics Routes', () => {
           status: 'READY',
           videoType: 'VOD',
           visibility: 'PUBLIC',
-          isLiveNow: false,
           viewsToday: 0,
           viewsMonth: 0,
           viewsTotal: 0
@@ -54,7 +53,6 @@ describe('Analytics Routes', () => {
           status: 'READY',
           videoType: 'VOD',
           visibility: 'PUBLIC',
-          isLiveNow: false,
           viewsToday: 0,
           viewsMonth: 0,
           viewsTotal: 0
@@ -82,7 +80,6 @@ describe('Analytics Routes', () => {
           status: 'READY',
           videoType: 'VOD',
           visibility: 'PUBLIC',
-          isLiveNow: false,
           viewsToday: 10,
           viewsMonth: 50,
           viewsTotal: 100
@@ -114,7 +111,6 @@ describe('Analytics Routes', () => {
           status: 'READY',
           videoType: 'VOD',
           visibility: 'PUBLIC',
-          isLiveNow: false,
           viewsToday: 5,
           viewsMonth: 10,
           viewsTotal: 20
@@ -149,7 +145,6 @@ describe('Analytics Routes', () => {
             status: 'READY',
             videoType: 'VOD',
             visibility: 'PUBLIC',
-            isLiveNow: false,
             viewsToday: 10,
             viewsMonth: 50,
             viewsTotal: 100
@@ -160,7 +155,6 @@ describe('Analytics Routes', () => {
             status: 'READY',
             videoType: 'VOD',
             visibility: 'PUBLIC',
-            isLiveNow: false,
             viewsToday: 20,
             viewsMonth: 60,
             viewsTotal: 120
@@ -194,7 +188,6 @@ describe('Analytics Routes', () => {
             status: 'READY',
             videoType: 'VOD',
             visibility: 'PUBLIC',
-            isLiveNow: false,
             viewsToday: 10,
             viewsMonth: 50,
             viewsTotal: 100

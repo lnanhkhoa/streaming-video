@@ -3,7 +3,6 @@
 import { useVideo } from '@/lib/hooks'
 import { VideoPlayer } from '@/components/video/VideoPlayer'
 import { TranscodingProgress } from '@/components/video/TranscodingProgress'
-import { Badge } from '@/components/ui/badge'
 import { useParams } from 'next/navigation'
 import { env } from '@/env'
 import { VIDEO_STATUS } from '@repo/constants'
@@ -34,7 +33,8 @@ export default function VideoPage() {
     )
   }
 
-  const manifestUrl = `${env.PROCESSED_STORAGE_URL}/${video.hlsManifestKey}`
+  // const manifestUrl = `${env.PROCESSED_STORAGE_URL}/${video.hlsManifestKey}`
+  const manifestUrl = 'https://pub-845d7acbe09f4f91b664f91648552594.r2.dev/master.m3u8'
 
   return (
     <main className="container mx-auto p-8">
@@ -54,13 +54,12 @@ export default function VideoPage() {
 
       {/* Show video player when ready */}
       {video.status === VIDEO_STATUS.READY && (
-        <VideoPlayer videoId={video.id} manifestUrl={manifestUrl} isLive={video.isLiveNow} />
+        <VideoPlayer videoId={video.id} manifestUrl={manifestUrl} isLive={false} />
       )}
 
       <div className="mt-6">
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-3xl font-bold">{video.title}</h1>
-          {video.isLiveNow && <Badge className="bg-red-600 text-white">🔴 LIVE</Badge>}
         </div>
 
         {video.description && <p className="text-gray-600 mb-4">{video.description}</p>}

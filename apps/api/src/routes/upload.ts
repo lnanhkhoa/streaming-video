@@ -63,7 +63,6 @@ export const uploadRoutes = app
         videoType: 'VOD',
         visibility: 'PRIVATE',
         originalKey: key,
-        isLiveNow: false,
         viewsToday: 0,
         viewsMonth: 0,
         viewsTotal: 0

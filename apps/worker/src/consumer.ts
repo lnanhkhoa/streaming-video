@@ -27,7 +27,6 @@ export interface TranscodeJob {
 export interface StartLiveStreamJob {
   type: 'start-live-stream'
   videoId: string
-  streamKey: string
   inputSource: string // RTMP URL, file path, or HTTP stream URL
 }
 
@@ -300,7 +299,6 @@ export async function startWorker(): Promise<void> {
           const liveJob = job as StartLiveStreamJob
           await liveStreamManager.startLiveStream({
             videoId: liveJob.videoId,
-            streamKey: liveJob.streamKey,
             inputSource: liveJob.inputSource
           })
           console.log(`✅ Live stream started: ${liveJob.videoId}\n`)

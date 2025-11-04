@@ -18,7 +18,6 @@ import { hlsPackager } from './hls-packager'
 
 export interface LiveStreamConfig {
   videoId: string
-  streamKey: string
   inputSource: string // RTMP URL, file path, or HTTP stream URL
 }
 
@@ -37,7 +36,7 @@ class LiveStreamManager {
    * Spawns FFmpeg process and sets up file watching
    */
   async startLiveStream(config: LiveStreamConfig): Promise<void> {
-    const { videoId, streamKey, inputSource } = config
+    const { videoId, inputSource } = config
 
     // Check if stream already active
     if (this.activeStreams.has(videoId)) {
@@ -46,7 +45,6 @@ class LiveStreamManager {
 
     console.log(`🎥 Starting live stream: ${videoId}`)
     console.log(`   Input: ${inputSource}`)
-    console.log(`   Stream Key: ${streamKey}`)
 
     // Create temporary output directory
     const outputDir = path.join(os.tmpdir(), `live-${videoId}`)
@@ -151,7 +149,6 @@ class LiveStreamManager {
         where: { id: videoId },
         data: {
           status: 'LIVE',
-          isLiveNow: true,
           hlsManifestKey: `live/${videoId}/index.m3u8`
         }
       })
@@ -261,8 +258,7 @@ class LiveStreamManager {
       await prisma.video.update({
         where: { id: videoId },
         data: {
-          status: newStatus,
-          isLiveNow: false
+          status: newStatus
         }
       })
 
@@ -290,8 +286,7 @@ class LiveStreamManager {
       await prisma.video.update({
         where: { id: videoId },
         data: {
-          status: 'FAILED',
-          isLiveNow: false
+          status: 'FAILED'
         }
       })
 
@@ -365,7 +360,7 @@ class LiveStreamManager {
 export const liveStreamManager = new LiveStreamManager()
 
 // Legacy exports for backward compatibility
-export async function startLiveStream(videoId: string, streamKey: string): Promise<void> {
+export async function startLiveStream(videoId: string): Promise<void> {
   throw new Error('Use liveStreamManager.startLiveStream() instead')
 }
 

@@ -15,7 +15,6 @@ describe('Video Workflow E2E', () => {
         status: 'READY',
         videoType: 'VOD',
         visibility: 'PUBLIC',
-        isLiveNow: false,
         viewsToday: 0,
         viewsMonth: 0,
         viewsTotal: 0,

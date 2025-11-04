@@ -15,8 +15,6 @@ export interface Video {
   hlsManifestKey?: string
   thumbnailKey?: string
   duration?: number
-  streamKey?: string
-  isLiveNow: boolean
   viewsToday: number
   viewsMonth: number
   viewsTotal: number
@@ -67,7 +65,6 @@ export interface CreateLiveStreamRequest {
 
 export interface CreateLiveStreamResponse {
   videoId: string
-  streamKey: string
   webrtcUrl: string
 }
 
