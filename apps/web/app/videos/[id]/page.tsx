@@ -7,34 +7,39 @@ import { useParams } from 'next/navigation'
 import { env } from '@/env'
 import { VIDEO_STATUS } from '@repo/constants'
 
+
+const video = {
+  status: "READY"
+}
+
 export default function VideoPage() {
-  const params = useParams()
-  const { data, isLoading, error } = useVideo(params.id as string)
-  const video = data?.video
+  // const params = useParams()
+  // const { data, isLoading, error } = useVideo(params.id as string)
+  // const video = data?.video
 
-  if (isLoading) {
-    return (
-      <main className="container mx-auto p-8">
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600 mx-auto" />
-          <p className="mt-4 text-gray-600">Loading video...</p>
-        </div>
-      </main>
-    )
-  }
+  // if (isLoading) {
+  //   return (
+  //     <main className="container mx-auto p-8">
+  //       <div className="text-center py-12">
+  //         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600 mx-auto" />
+  //         <p className="mt-4 text-gray-600">Loading video...</p>
+  //       </div>
+  //     </main>
+  //   )
+  // }
 
-  if (error || !video) {
-    return (
-      <main className="container mx-auto p-8">
-        <div className="text-center py-12 text-red-600">
-          <p>Failed to load video: {error?.message || 'Video not found'}</p>
-        </div>
-      </main>
-    )
-  }
+  // if (error || !video) {
+  //   return (
+  //     <main className="container mx-auto p-8">
+  //       <div className="text-center py-12 text-red-600">
+  //         <p>Failed to load video: {error?.message || 'Video not found'}</p>
+  //       </div>
+  //     </main>
+  //   )
+  // }
 
   // const manifestUrl = `${env.PROCESSED_STORAGE_URL}/${video.hlsManifestKey}`
-  const manifestUrl = 'https://pub-845d7acbe09f4f91b664f91648552594.r2.dev/master.m3u8'
+  const manifestUrl = 'https://pub-aa3b88716caa49448c30e2ab3bd8f98b.r2.dev/interstellar/master.m3u8'
 
   return (
     <main className="container mx-auto p-8">
@@ -62,13 +67,13 @@ export default function VideoPage() {
           <h1 className="text-3xl font-bold">{video.title}</h1>
         </div>
 
-        {video.description && <p className="text-gray-600 mb-4">{video.description}</p>}
+        {/* {video.description && <p className="text-gray-600 mb-4">{video.description}</p>} */}
 
         {/* <VideoStats videoId={video.id} /> */}
 
-        <div className="mt-4 text-sm text-gray-500">
+        {/* <div className="mt-4 text-sm text-gray-500">
           <p>Uploaded: {new Date(video.createdAt).toLocaleDateString()}</p>
-        </div>
+        </div> */}
       </div>
     </main>
   )
