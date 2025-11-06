@@ -9,13 +9,15 @@
     "typecheck": "tsc --noEmit",
     "test:transcode": "tsx test-transcode.ts",
     "test:storage": "tsx test-storage.ts",
-    "test:e2e": "tsx test-e2e.ts"
+    "test:e2e": "tsx test-e2e.ts",
+    "transcode": "tsx transcode-cli.ts"
   },
   "dependencies": {
     "@repo/constants": "workspace:*",
     "@repo/database": "workspace:*",
     "@repo/utils": "workspace:*",
     "amqplib": "^0.10.5",
+    "commander": "^12.1.0",
     "dotenv": "^17.2.3",
     "chokidar": "^4.0.3",
     "fluent-ffmpeg": "^2.1.3",
